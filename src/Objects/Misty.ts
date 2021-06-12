@@ -1,16 +1,8 @@
-import Phaser from 'phaser';
+import Phaser, { Scene } from 'phaser';
 
 export default class Misty extends Phaser.GameObjects.Sprite {
 
-    // cursors = null as Phaser.Types.Input.Keyboard.CursorKeys|null;
-    // controls = null as Phaser.Cameras.Controls.FixedKeyControl|null;
-
-    create() {
-
-    }
-
-    update(time: number, delta: number) {
-
-    }
-
+    // constructor(scene:Scene, x: number, y: number) {
+    //     super(scene, x, y, 'Texture', 'Frame'); // The frame is optional
+    // }
 }

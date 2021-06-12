@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import Misty from "../Objects/Misty";
+import Misty from "../objects/Misty";
 
 export default class Demo extends Phaser.Scene {
 
@@ -18,8 +18,14 @@ export default class Demo extends Phaser.Scene {
 
   create() {
 
-    // const player = this.add.sprite(200, 7700, 'misty');
-    const player = this.physics.add.sprite(200, 7500, 'misty');
+    // create Misty
+    const misty = new Misty(this, 200, 7700, 'misty')
+
+    // add to this scene
+    this.add.existing(misty);
+
+    // add to physics engine
+    this.physics.add.existing(misty);
 
     // create the Tilemap
     const map = this.make.tilemap({ key: 'tilemap' })
@@ -29,11 +35,11 @@ export default class Demo extends Phaser.Scene {
     const layer = map.createLayer('Tile Layer 1', tileset);
     layer.setCollisionByExclusion([-1], true);
 
-    this.physics.add.collider(player, layer);
+    this.physics.add.collider(misty, layer);
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setScroll(0, 10000);
-    this.cameras.main.startFollow(player);
+    this.cameras.main.startFollow(misty);
 
     var cursors = this.input.keyboard.createCursorKeys();
 

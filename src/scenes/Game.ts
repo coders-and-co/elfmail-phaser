@@ -32,6 +32,8 @@ export default class Demo extends Phaser.Scene {
     // add to physics engine
     this.physics.add.existing(this.misty);
     this.misty.body.setCollideWorldBounds(true);
+    this.misty.body.setSize(33,90);
+    this.misty.body.setOffset(33,60)
 
 
 

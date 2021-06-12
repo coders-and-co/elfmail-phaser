@@ -7,7 +7,7 @@ type SpriteWithDynamicBody = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 export default class Misty extends Phaser.GameObjects.Sprite {
 
     movementState: BaseState|null = null;
-    body: any;
+    body!: Phaser.Physics.Arcade.Body;
     runSpeed = 500;
 
     constructor(scene:Scene, x: number, y: number, texture: string, frame?: number) {

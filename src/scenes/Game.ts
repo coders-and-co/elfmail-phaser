@@ -161,12 +161,7 @@ export default class Demo extends Phaser.Scene {
         // Update MovementState and respond to state changes
         const nextState = this.misty.movementState!.update();
         if (nextState) {
-            console.log(nextState.type.name);
-            if (this.misty.movementState != null) {
-                this.misty.movementState.exit();
-            }
-            this.misty.movementState = new nextState.type(this.misty, this.cursors);
-            this.misty.movementState.enter(nextState.params || {});
+            this.misty.changeState(nextState);
         }
     }
 

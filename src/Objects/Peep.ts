@@ -21,7 +21,9 @@ export default class Peep extends Phaser.GameObjects.Sprite {
         this.id = id;
         this.sender = sender;
         // add letter to the scene
-        scene.add.existing(this); // add letter to this scene
+        //if (sender) {
+            scene.add.existing(this); // add letter to this scene
+        //}
 
         // add letter to the Physics world
         this.body = new Phaser.Physics.Arcade.StaticBody(world, this);
@@ -31,6 +33,16 @@ export default class Peep extends Phaser.GameObjects.Sprite {
         // this.body.setCollideWorldBounds(true);
         this.body.setSize(90,73);
         this.body.setOffset(5,15);
+        this.setDepth(0);
+
+        this.anims.create({
+            key: 'computer_peep',
+            frames: this.anims.generateFrameNumbers('computer_peep', { start: 0, end: 1 }),
+            frameRate: 1,
+            repeat: -1
+        });
+        this.anims.play('computer_peep', true);
+
     }
 
     collected () {

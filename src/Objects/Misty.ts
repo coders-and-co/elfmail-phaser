@@ -20,6 +20,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
         // add Misty to the Physics world
         this.body = new Phaser.Physics.Arcade.Body(world, this);
+        this.setDepth(1);
         world.add(this.body);
 
         // set Misty's collision properties

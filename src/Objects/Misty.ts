@@ -1,11 +1,12 @@
 import Phaser, { Scene } from 'phaser';
-import BaseState from '../states/BaseState';
+import BaseState, { StateReturn } from '../states/BaseState';
 import IdleState from '../states/IdleState';
 
 export default class Misty extends Phaser.GameObjects.Sprite {
 
     movementState: BaseState|null = null;
     body: Phaser.Physics.Arcade.Body;
+    cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
     runSpeed = 500;
     jumpPower = 900;
@@ -18,6 +19,9 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         // add Misty to the scene
         scene.add.existing(this); // add Misty to this scene
 
+        // save referece to cursors
+        this.cursors = cursors;
+
         // add Misty to the Physics world
         this.body = new Phaser.Physics.Arcade.Body(world, this);
         this.setDepth(1);
@@ -29,7 +33,8 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         this.body.setOffset(30,60);
 
         // set initial MovementState
-        this.movementState = new IdleState(this, cursors);
+        // this.movementState = new IdleState(this, cursors);
+        this.changeState({type: IdleState});
 
         // Create animations
         this.anims.create({
@@ -59,5 +64,14 @@ export default class Misty extends Phaser.GameObjects.Sprite {
             repeat: -1
         });
 
+    }
+
+    changeState(nextState: StateReturn) {
+        console.log(nextState.type.name);
+        if (this.movementState != null) {
+            this.movementState.exit();
+        }
+        this.movementState = new nextState.type(this, this.cursors);
+        this.movementState.enter(nextState.params || {});
     }
 }

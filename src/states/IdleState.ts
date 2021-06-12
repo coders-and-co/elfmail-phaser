@@ -1,6 +1,7 @@
 import BaseState from './BaseState'
 import RunState, { Direction } from './RunState'
 import Misty from '../objects/Misty';
+import JumpState from "./JumpState";
 // import JumpState from './JumpState'
 
 export default class IdleState implements BaseState {
@@ -20,9 +21,9 @@ export default class IdleState implements BaseState {
         if (cursors.right.isDown) {
             return new RunState(this.sprite, Direction.Right);
         }
-        // if (cursors.up.isDown) {
-        //     return new JumpState(this.sprite);
-        // }
+        if (cursors.space.isDown && this.sprite.body.onFloor()) {
+            return new JumpState(this.sprite, cursors);
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 import BaseState from './BaseState';
 import IdleState from './IdleState';
 import Misty from '../objects/Misty';
+import JumpState from "./JumpState";
 
 export enum Direction {
     Left,
@@ -27,15 +28,12 @@ export default class RunState implements BaseState {
     }
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): BaseState|void {
-
         if (!cursors.right.isDown && this.direction == Direction.Right) {
             return new IdleState(this.sprite);
         } else if (!cursors.left.isDown && this.direction == Direction.Left) {
             return new IdleState(this.sprite);
+        } else if (cursors.space.isDown) {
+            return new JumpState(this.sprite, cursors);
         }
-        // if (cursors.up.isDown && this.sprite.body.touching.down) {
-        //     this.sprite.body.setVelocityY(-330);
-        // }
     }
-
 }

@@ -4,20 +4,35 @@ import Letter, {LetterTypes} from "../Objects/Letter";
 // import City from "../city";
 import Peep from "../Objects/Peep";
 
+
+enum DeliveryState {
+    Waiting,
+    PickedUp,
+    Delivered,
+}
+
 export interface Delivery {
     sender: Peep,
     receiver: Peep,
     letter: Letter,
     message: string,
-    state: 'waiting' | 'pickedUp' | 'delivered',
+    state: DeliveryState,
 }
+
+export interface Point {
+    x: number;
+    y: number;
+}
+
+
 
 export default class Demo extends Phaser.Scene {
 
     misty!: Misty;
     letter!: Letter;
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-    deliveries!: Delivery[];
+    deliveries: Delivery[] = [];
+    windowLocations: Point[] = [];
 
     constructor() {
         super('GameScene');
@@ -30,13 +45,35 @@ export default class Demo extends Phaser.Scene {
         this.load.image('sky','assets/sky_gradient.png');
         // this.load.image('test_tiles', 'assets/tiles_sheet.png');
         this.load.image('city_tiles', 'assets/Tileset/tileset_city.png');
-        this.load.spritesheet('misty_run', 'assets/run_animation.png', {frameWidth: 100, frameHeight: 150});
-        this.load.spritesheet('misty_idle', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
-        this.load.spritesheet('misty_fall', 'assets/fall_animation.png', {frameWidth: 100, frameHeight: 150});
-        this.load.spritesheet('misty_jump', 'assets/jump_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_run', 'assets/misty_animations/run_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_idle', 'assets/misty_animations/idle_animation_blink.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_fall', 'assets/misty_animations/fall_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_jump', 'assets/misty_animations/jump_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.image('letter', 'assets/letter.png');
         this.load.spritesheet('computer_peep', 'assets/peeps/computer_peep.png', {frameWidth: 200, frameHeight: 200});
         this.load.spritesheet('phone_peep', 'assets/peeps/phone_peep.png', {frameWidth: 200, frameHeight: 200});
+    }
+
+    addNewDelivery() {
+
+        const indexSender = Math.floor(Math.random() * this.windowLocations.length);
+        const pointSender = this.windowLocations.splice(indexSender, 1)[0];
+        const indexReceiver = Math.floor(Math.random() * this.windowLocations.length);
+        const pointReceiver = this.windowLocations.splice(indexReceiver, 1)[0];
+
+        const delivery = {
+            sender: new Peep(this, this.physics.world, pointSender.x, pointSender.y, 'computer_peep', 1, true),
+            receiver: new Peep(this, this.physics.world, pointReceiver.x, pointReceiver.y, 'phone_peep', 1, false),
+            letter: new Letter(this, this.physics.world, pointSender.x, pointSender.y - 100, 'letter', 1, LetterTypes.love),
+            message: 'watermelons on sale',
+            state: DeliveryState.Waiting,
+        }
+
+        this.deliveries.push(delivery);
+
+        console.log('delivery', delivery);
+        this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, delivery);
+
     }
 
     create() {
@@ -48,20 +85,7 @@ export default class Demo extends Phaser.Scene {
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
         this.misty = new Misty(this, this.physics.world, this.cursors, 200, 9500, 'misty_idle');
 
-        // letter
-        this.deliveries = [];
-        this.deliveries.push({
-            sender: new Peep(this, this.physics.world, 800, 9000, 'computer_peep', 1, true),
-            receiver: new Peep(this, this.physics.world, 1100, 8700, 'phone_peep', 1, false),
-            letter: new Letter(this, this.physics.world, 800, 8900, 'letter', 1, LetterTypes.love),
-            message: 'watermelons on sale',
-            state: 'waiting',
-        })
-        this.deliveries.forEach((delivery) => {
-            console.log('delivery', delivery);
-            this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, delivery);
-        })
-        //this.letter = new Letter(this, this.physics.world, 300, 9000, 'letter', 1, LetterTypes.love);
+
 
         // Load Tilemap
         const city = this.make.tilemap({ key: 'city_tilemap' });
@@ -95,9 +119,26 @@ export default class Demo extends Phaser.Scene {
             city.createLayer('Overlay Tiles', base_tileset),
         ]
 
+        const triggers = city.getObjectLayer('Spawn Triggers');
+        for (const t of triggers.objects) {
+            if (t.rectangle && t.type == 'window') {
+                if (t.x && t.y) {
+                    this.windowLocations.push({x: t.x + 100, y: t.y + 100});
+                }
+            }
+        }
+
+        console.log('WINDOW LOCATIONS:');
+        console.log(this.windowLocations);
+
+        // spawn letters
+        for (let x of Array(3)) {
+            this.addNewDelivery();
+        }
+
         tileLayers[0].setDepth(-1);
         tileLayers[1].setCollisionByExclusion([-1], true);
-        // tileLayer3.
+        tileLayers[2].setDepth(100);
 
         // Misty should collide with the the foreground map layer
         this.physics.add.collider(this.misty, tileLayers[1]);
@@ -120,12 +161,7 @@ export default class Demo extends Phaser.Scene {
         // Update MovementState and respond to state changes
         const nextState = this.misty.movementState!.update();
         if (nextState) {
-            console.log(nextState.type.name);
-            if (this.misty.movementState != null) {
-                this.misty.movementState.exit();
-            }
-            this.misty.movementState = new nextState.type(this.misty, this.cursors);
-            this.misty.movementState.enter(nextState.params || {});
+            this.misty.changeState(nextState);
         }
     }
 

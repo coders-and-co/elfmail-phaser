@@ -21,6 +21,9 @@ export default class FallState implements BaseState {
             this.sprite.setFlip(false, false);
             this.sprite.body.setVelocityX(this.sprite.runSpeed);
         }
+        if (!cursors.right.isDown && !cursors.left.isDown) {
+            this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
+        }
         if (this.sprite.body.onFloor()) {
             return new IdleState(this.sprite);
         }

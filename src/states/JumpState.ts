@@ -26,6 +26,9 @@ export default class JumpState implements BaseState {
         if (this.sprite.body.velocity.y > 0) {
             return new FallState(this.sprite, cursors);
         }
+        if (!cursors.right.isDown && !cursors.left.isDown) {
+            this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
+        }
         // Keep this state in case you jump directly to a platform and never attain + velocity
         if (this.sprite.body.onFloor()) {
             return new IdleState(this.sprite);

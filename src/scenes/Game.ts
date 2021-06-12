@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import Phaser, { GameObjects } from 'phaser';
 import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
 // import City from "../city";
@@ -119,6 +119,7 @@ export default class Demo extends Phaser.Scene {
             city.createLayer('Overlay Tiles', base_tileset),
         ]
 
+        // process spawn triggers
         const triggers = city.getObjectLayer('Spawn Triggers');
         for (const t of triggers.objects) {
             if (t.rectangle && t.type == 'window') {
@@ -137,12 +138,13 @@ export default class Demo extends Phaser.Scene {
         }
 
         tileLayers[0].setDepth(-1);
-        tileLayers[1].setCollisionByExclusion([-1], true);
+        tileLayers[1].setCollisionFromCollisionGroup(true);
         tileLayers[2].setDepth(100);
 
         // Misty should collide with the the foreground map layer
-        this.physics.add.collider(this.misty, tileLayers[1]);
-        //this.physics.add.overlap(this.letter, this.misty, this.letter.collected, undefined, this.letter);
+        // this.physics.add.collider(this.misty, tileLayers[1])
+        this.physics.add.collider(this.misty, tileLayers[1], this.physicsCollisionPlatform, this.physicsProcessPlatform, this.misty);
+        // this.physics.add.overlap(this.letter, this.misty, this.letter.collected, undefined, this.letter);
 
         // Camera and Physics Bounds
         this.physics.world.setBounds(0, 0, city.widthInPixels, city.heightInPixels);
@@ -156,7 +158,24 @@ export default class Demo extends Phaser.Scene {
 
     }
 
+    physicsCollisionPlatform(obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
+
+    }
+
+    physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Tilemaps.Tile) {
+
+        if (this == obj1 && [9, 10, 11].includes(obj2.index)) {
+            if(obj1.body.velocity.y < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     update(time: number, delta: number) {
+
+        // collide
+        // this.physics.collideTiles(this.misty, )
 
         // Update MovementState and respond to state changes
         const nextState = this.misty.movementState!.update();

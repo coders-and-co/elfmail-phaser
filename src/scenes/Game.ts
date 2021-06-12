@@ -165,7 +165,7 @@ export default class Demo extends Phaser.Scene {
         }
     }
 
-    collected(){
+    collected(this: Delivery){
         console.log('this in collected')
         console.log(this.sender);
         //this.sender.setTexture('computer_peep',1)

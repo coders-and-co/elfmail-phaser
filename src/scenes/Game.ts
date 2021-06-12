@@ -18,7 +18,8 @@ export default class Demo extends Phaser.Scene {
         this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/city.json');
         // images
         this.load.image('sky','assets/sky_gradient.png');
-        this.load.image('base_tiles', 'assets/tiles_sheet.png');
+        // this.load.image('test_tiles', 'assets/tiles_sheet.png');
+        this.load.image('city_tiles', 'assets/Tileset/tileset_city.png');
         this.load.spritesheet('misty_run', 'assets/run_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_idle', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_fall', 'assets/fall_animation.png', {frameWidth: 100, frameHeight: 150});
@@ -42,7 +43,8 @@ export default class Demo extends Phaser.Scene {
         const city = this.make.tilemap({ key: 'city_tilemap' });
 
         // add the tileset image we are using
-        const tileset = city.addTilesetImage('tiles_sheet', 'base_tiles');
+        // const test_tileset = city.addTilesetImage('tiles_sheet', 'test_tiles');
+        const base_tileset = city.addTilesetImage('tileset_city', 'city_tiles');
 
         // load layers
 
@@ -64,9 +66,9 @@ export default class Demo extends Phaser.Scene {
         console.log(city.images);
 
         const tileLayers = [
-            city.createLayer('Background Tiles', tileset),
-            city.createLayer('Foreground Tiles', tileset),
-            city.createLayer('Overlay Tiles', tileset),
+            city.createLayer('Background Tiles', base_tileset),
+            city.createLayer('Foreground Tiles', base_tileset),
+            city.createLayer('Overlay Tiles', base_tileset),
         ]
 
         tileLayers[0].setDepth(-1);

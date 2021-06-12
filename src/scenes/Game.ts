@@ -15,7 +15,7 @@ export default class Demo extends Phaser.Scene {
   preload() {
     this.load.tilemapTiledJSON('tilemap', 'assets/test-map.json');
     this.load.image('base_tiles', 'assets/tiles_sheet.png');
-    this.load.spritesheet('misty', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
+    this.load.spritesheet('misty', 'assets/misty_testanim.png', { frameWidth: 100, frameHeight: 150 });
   }
   create() {
 
@@ -94,5 +94,4 @@ export default class Demo extends Phaser.Scene {
     }
 
   }
-
 }

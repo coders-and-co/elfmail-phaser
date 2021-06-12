@@ -1,17 +1,19 @@
-import Phaser from 'phaser';
+import Phaser, { Textures } from 'phaser';
 import Misty from "../objects/Misty";
 import IdleState from '../states/IdleState';
 import BaseState from '../states/BaseState';
 
 export default class Demo extends Phaser.Scene {
 
-  private cursors: Phaser.Types.Input.Keyboard.CursorKeys|null = null;
-  private misty: Misty|null = null;
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys|null = null;
+  misty: Misty|null = null;
+  bg: Phaser.GameObjects.Image|null = null;
 
 
   constructor() {
     super('GameScene');
   }
+
   preload() {
     this.load.image('sky','assets/sky_gradient.png');
     this.load.tilemapTiledJSON('tilemap', 'assets/test-map.json');
@@ -19,33 +21,49 @@ export default class Demo extends Phaser.Scene {
     this.load.spritesheet('misty', 'assets/run_animation.png', {frameWidth: 100, frameHeight: 150});
     this.load.spritesheet('misty_stand', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
   }
+
   create() {
-    this.add.image(0, 0, 'sky').setOrigin(0, 0);
-    this.misty =  new Misty(this, 200, 7700, 'misty_stand');
+
+
+
+    this.misty =  new Misty(this, 200, 9000, 'misty_stand');
 
     // add to this scene
     this.add.existing(this.misty);
 
     // add to physics engine
     this.physics.add.existing(this.misty);
+    this.misty.body.setCollideWorldBounds(true);
 
-    // create the Tilemap
+
+
+
+    // TILEMAP LOADING
     const map = this.make.tilemap({ key: 'tilemap' })
-
     // add the tileset image we are using
     const tileset = map.addTilesetImage('tiles_sheet', 'base_tiles')
-    const layer = map.createLayer('Tile Layer 1', tileset);
-    layer.setCollisionByExclusion([-1], true);
+    // load layers
+    const bgLayer = map.createLayer('Background', tileset);
+    const fgLayer = map.createLayer('Tile Layer 1', tileset);
+    bgLayer.setDepth(-1);
+    fgLayer.setCollisionByExclusion([-1], true);
 
-    this.physics.add.collider(this.misty, layer);
+    this.physics.add.collider(this.misty, fgLayer);
 
     this.misty.movementState = new IdleState(this.misty);
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
     this.cameras.main.setScroll(0, 10000);
     this.cameras.main.startFollow(this.misty);
 
-    // var cursors = this.input.keyboard.createCursorKeys();
+    // BACKGROUND
+    this.bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'sky');
+    this.bg.setDepth(-2);
+    this.bg.setScrollFactor(this.bg.width / (map.widthInPixels * 5), 0.04);
+
+
     this.cursors = this.input.keyboard.createCursorKeys();
 
     //this.controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
@@ -76,6 +94,10 @@ export default class Demo extends Phaser.Scene {
     if(!this.misty || !this.cursors) {
       return;
     }
+
+    // this.bg!.setPosition(this.cameras.main., 10000);
+    // this.bg!.
+
 
     const nextState = this.misty.movementState!.update(this.cursors);
     if (nextState) {

@@ -15,9 +15,6 @@ export default class RunState extends BaseState {
 
     enter(params: { direction: Direction }) {
 
-        // console.log('params:', params);
-        // this.direction = ;
-
         this.sprite.anims.play('misty_run', true);
         if (params.direction === Direction.Left) {
             // console.log('left', this.direction);

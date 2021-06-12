@@ -46,7 +46,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         this.anims.create({
             key: 'misty_jump',
             frames: this.anims.generateFrameNumbers('misty_jump', { start: 0, end: 1 }),
-            frameRate: 15,
+            frameRate: 10,
             repeat: -1
         });
 

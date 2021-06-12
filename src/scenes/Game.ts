@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import Misty from "../Objects/Misty";
 
 export default class Demo extends Phaser.Scene {
 
@@ -12,9 +13,14 @@ export default class Demo extends Phaser.Scene {
   preload() {
     this.load.tilemapTiledJSON('tilemap', 'assets/test-map.json');
     this.load.image('base_tiles', 'assets/tiles_sheet.png');
+    this.load.image('misty', 'assets/player_sheet.png');
   }
 
   create() {
+    //const player = new Misty(this,500,9800,'misty',)
+    const player = this.physics.add.sprite(500, 9800, 'misty');
+    player.setCollideWorldBounds(true);
+
 
     // create the Tilemap
     const map = this.make.tilemap({ key: 'tilemap' })

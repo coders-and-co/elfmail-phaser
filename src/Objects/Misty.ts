@@ -8,8 +8,8 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     body: Phaser.Physics.Arcade.Body;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
-    runSpeed = 500;
-    jumpPower = 900;
+    runSpeed = 800;
+    jumpPower = 1200;
     inJumpState = false;
 
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
@@ -43,7 +43,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         this.anims.create({
             key: 'misty_run',
             frames: this.anims.generateFrameNumbers('misty_run', { start: 0, end: 6 }),
-            frameRate: 15,
+            frameRate: 18,
             repeat: -1
         });
 

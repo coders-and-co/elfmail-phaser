@@ -64,7 +64,7 @@ export default class Demo extends Phaser.Scene {
 
         // add the tileset image we are using
         // const test_tileset = city.addTilesetImage('tiles_sheet', 'test_tiles');
-        const base_tileset = city.addTilesetImage('tileset_city', 'city_tiles');
+        const base_tileset = city.addTilesetImage('tileset_buildings', 'city_tiles');
 
         // load layers
 

@@ -1,12 +1,12 @@
 import Phaser from 'phaser';
 import Misty from "../objects/Misty";
+import IdleState from '../states/IdleState';
+import BaseState from '../states/BaseState';
 
 export default class Demo extends Phaser.Scene {
 
-  // cursors = null as Phaser.Types.Input.Keyboard.CursorKeys|null;
-  controls = null as Phaser. Cameras.Controls.FixedKeyControl|null;
-  private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-  private misty;
+  private cursors: Phaser.Types.Input.Keyboard.CursorKeys|null = null;
+  private misty: Misty|null = null;
 
 
   constructor() {
@@ -20,6 +20,7 @@ export default class Demo extends Phaser.Scene {
   create() {
 
     this.misty =  new Misty(this, 200, 7700, 'misty');
+
 
 
     // add to this scene
@@ -37,6 +38,8 @@ export default class Demo extends Phaser.Scene {
     layer.setCollisionByExclusion([-1], true);
 
     this.physics.add.collider(this.misty, layer);
+
+    this.misty.movementState = new IdleState(this.misty);
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setScroll(0, 10000);
@@ -79,33 +82,17 @@ export default class Demo extends Phaser.Scene {
   }
 
   update(time: number, delta: number) {
-    //this.controls?.update(delta);
-    if (this.cursors.left.isDown)
-    {
-      console.log('leftt');
-      this.misty.body.setVelocityX(-160);
-      this.misty.setFlip(true, false);
 
-      this.misty.anims.play('left', true);
-    }
-    else if (this.cursors.right.isDown)
-    {
-      this.misty.body.setVelocityX(160);
-      this.misty.setFlip(false, false);
-
-      this.misty.anims.play('right', true);
-    }
-    else
-    {
-      this.misty.body.setVelocityX(0);
-
-      this.misty.anims.play('turn');
+    if(!this.misty || !this.cursors) {
+      return;
     }
 
-    if (this.cursors.up.isDown && this.misty.body.touching.down)
-    {
-      this.misty.body.setVelocityY(-330);
-     }
+    const nextState = this.misty.movementState!.update(this.cursors);
+    if (nextState) {
+      console.log(this.misty.movementState);
+      this.misty.movementState = nextState;
+    }
+
   }
 
 }

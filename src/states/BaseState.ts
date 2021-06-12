@@ -1,15 +1,16 @@
-export default class BaseState {
+import Phaser, { GameObjects } from 'phaser';
+import Misty from '../objects/Misty';
 
-    enter() {
+export default interface BaseState {
 
-    }
+    sprite: Misty;
 
-    exit() {
+    // constructor(obj: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+    //     this.sprite = obj;
+    // }
+    // enter(): void;
+    // exit(): void;
 
-    }
-
-    update() {
-
-    }
+    update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): BaseState|void;
 
 }

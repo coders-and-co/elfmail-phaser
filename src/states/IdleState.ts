@@ -1,6 +1,6 @@
 import BaseState, { StateReturn } from './BaseState'
 import RunState, { Direction } from './RunState'
-import Misty from '../objects/Misty';
+import Misty from '../Objects/Misty';
 import JumpState from "./JumpState";
 
 export default class IdleState extends BaseState {
@@ -13,7 +13,10 @@ export default class IdleState extends BaseState {
     }
 
     update(): StateReturn|void {
-        if (this.cursors.space.isDown && this.sprite.body.onFloor()) {
+        if (this.cursors.space.isUp) {
+            this.sprite.inJumpState = false;
+        }
+        if (this.cursors.space.isDown && this.sprite.body.onFloor() && !this.sprite.inJumpState) {
             return { type: JumpState };
         } else if (this.cursors.left.isDown) {
             return { type: RunState, params: { direction: Direction.Left }};

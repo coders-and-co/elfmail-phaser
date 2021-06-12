@@ -1,12 +1,12 @@
-import Phaser, { Textures } from 'phaser';
-import Misty from "../objects/Misty";
-import City from "../city";
-import IdleState from '../states/IdleState';
-import BaseState from '../states/BaseState';
+import Phaser from 'phaser';
+import Misty from "../Objects/Misty";
+import Letter, {LetterTypes} from "../Objects/Letter";
+// import City from "../city";
 
 export default class Demo extends Phaser.Scene {
 
     misty!: Misty;
+    letter!: Letter;
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
     constructor() {
@@ -23,6 +23,7 @@ export default class Demo extends Phaser.Scene {
         this.load.spritesheet('misty_idle', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_fall', 'assets/fall_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_jump', 'assets/jump_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('letter', 'assets/letter.png', {frameWidth: 100, frameHeight: 100});
     }
 
     create() {
@@ -33,6 +34,9 @@ export default class Demo extends Phaser.Scene {
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
         this.misty = new Misty(this, this.physics.world, this.cursors, 200, 9500, 'misty_idle');
+
+        // letter
+        this.letter = new Letter(this, this.physics.world, 300, 9500, 'letter', 1, LetterTypes.love);
 
         // Load Tilemap
         const city = this.make.tilemap({ key: 'city_tilemap' });
@@ -71,6 +75,7 @@ export default class Demo extends Phaser.Scene {
 
         // Misty should collide with the the foreground map layer
         this.physics.add.collider(this.misty, tileLayers[1]);
+        this.physics.add.collider(this.letter, this.misty, this.letter.collected, undefined, this);
 
         // Camera and Physics Bounds
         this.physics.world.setBounds(0, 0, city.widthInPixels, city.heightInPixels);

@@ -9,6 +9,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     runSpeed = 500;
     jumpPower = 900;
+    inJumpState = false;
 
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
 

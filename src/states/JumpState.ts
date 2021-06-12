@@ -9,9 +9,13 @@ export default class JumpState extends BaseState {
     enter() {
         this.sprite.anims.play('misty_jump', true);
         this.sprite.body.setVelocityY(-this.sprite.jumpPower);
+        this.sprite.inJumpState = true;
     }
 
     update(): StateReturn|void {
+        if (this.cursors.space.isUp) {
+            this.sprite.inJumpState = false;
+        }
         if (this.sprite.body.velocity.y > 0) {
             return { type: FallState };
         } else if (this.sprite.body.onFloor()) {

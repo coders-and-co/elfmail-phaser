@@ -1,31 +1,27 @@
-import BaseState from './BaseState';
+import BaseState, { StateReturn } from './BaseState'
 import IdleState from './IdleState';
-import Misty from '../objects/Misty';
 
+export default class FallState extends BaseState {
 
-export default class FallState implements BaseState {
+    name = 'fall';
 
-    sprite: Misty;
-
-    constructor(sprite: Misty, cursors:  Phaser.Types.Input.Keyboard.CursorKeys) {
-        this.sprite = sprite;
+    enter() {
         this.sprite.anims.play('misty_fall', true);
     }
 
-    update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): BaseState|void {
-        if (cursors.left.isDown) {
-            this.sprite.setFlip(true, false);
-            this.sprite.body.setVelocityX(-this.sprite.runSpeed);
-        }
-        if (cursors.right.isDown) {
-            this.sprite.setFlip(false, false);
-            this.sprite.body.setVelocityX(this.sprite.runSpeed);
-        }
-        if (!cursors.right.isDown && !cursors.left.isDown) {
-            this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
-        }
+    update(): StateReturn|void {
         if (this.sprite.body.onFloor()) {
-            return new IdleState(this.sprite);
+            return { type: IdleState };
+        } else {
+            if (this.cursors.left.isDown) {
+                this.sprite.setFlip(true, false);
+                this.sprite.body.setVelocityX(-this.sprite.runSpeed);
+            } else if (this.cursors.right.isDown) {
+                this.sprite.setFlip(false, false);
+                this.sprite.body.setVelocityX(this.sprite.runSpeed);
+            } else {
+                this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
+            }
         }
     }
 }

@@ -16,7 +16,6 @@ export default {
         tileBias: 100,
         gravity: { y: 1000 },
         debug: true,
-
     }
   },
 

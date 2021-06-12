@@ -1,16 +1,32 @@
 import Phaser, { GameObjects } from 'phaser';
 import Misty from '../objects/Misty';
 
-export default interface BaseState {
+export interface StateReturn {
+    type: typeof BaseState;
+    params?: any
+}
 
-    sprite: Misty;
+export default class BaseState {
 
-    // constructor(obj: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
-    //     this.sprite = obj;
-    // }
-    // enter(): void;
-    // exit(): void;
+    name = 'basestate';
+    sprite!: Misty;
+    cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
-    update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): BaseState|void;
+    constructor(sprite: Misty, cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
+        this.sprite = sprite;
+        this.cursors = cursors;
+    }
+
+    enter(params: any): void {
+
+    }
+
+    exit(): void {
+
+    }
+
+    update(): StateReturn|void {
+
+    }
 
 }

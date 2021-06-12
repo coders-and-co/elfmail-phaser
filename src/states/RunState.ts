@@ -1,6 +1,5 @@
-import BaseState from './BaseState';
+import BaseState, { StateReturn } from './BaseState'
 import IdleState from './IdleState';
-import Misty from '../objects/Misty';
 import JumpState from "./JumpState";
 import FallState from './FallState';
 
@@ -9,33 +8,43 @@ export enum Direction {
     Right
 }
 
-export default class RunState implements BaseState {
+export default class RunState extends BaseState {
 
-    sprite: Misty;
-    direction: Direction = Direction.Right;
+    name = 'run';
+    direction: Direction|null = null;
 
-    constructor(sprite: Misty, direction: Direction) {
-        this.sprite = sprite;
-        this.direction = direction;
+    enter(params: { direction: Direction }) {
+
+        // console.log('params:', params);
+        // this.direction = ;
+
         this.sprite.anims.play('misty_run', true);
-        if (direction == Direction.Left) {
-            this.sprite.body.setVelocityX(sprite.runSpeed * -1);
+        if (params.direction === Direction.Left) {
+            // console.log('left', this.direction);
+            this.direction = Direction.Left;
+            this.sprite.body.setVelocityX(this.sprite.runSpeed * -1);
             this.sprite.setFlip(true, false);
-        } else {
-            this.sprite.body.setVelocityX(sprite.runSpeed);
+        } else if (params.direction === Direction.Right) {
+            // console.log('right', this.direction);
+            this.direction = Direction.Right;
+            this.sprite.body.setVelocityX(this.sprite.runSpeed);
             this.sprite.setFlip(false, false);
         }
+
     }
 
-    update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): BaseState|void {
+    update(): StateReturn|void {
+        // console.log('update: direction:', this.direction);
         if (!this.sprite.body.onFloor()) {
-            return new FallState(this.sprite, cursors);
-        } else if (!cursors.right.isDown && this.direction == Direction.Right) {
-            return new IdleState(this.sprite);
-        } else if (!cursors.left.isDown && this.direction == Direction.Left) {
-            return new IdleState(this.sprite);
-        } else if (cursors.space.isDown) {
-            return new JumpState(this.sprite, cursors);
+            return { type: FallState };
+        } else if (this.cursors.space.isDown) {
+            return { type: JumpState };
+        } else if (!this.cursors.right.isDown && !this.cursors.left.isDown) {
+            return { type: IdleState };
+        } else if (this.cursors.right.isDown && this.direction !== Direction.Right) {
+            return { type: RunState, params: { direction: Direction.Right }};
+        } else if (this.cursors.left.isDown && this.direction !== Direction.Left) {
+            return {type: RunState, params: { direction: Direction.Left }};
         }
     }
 }

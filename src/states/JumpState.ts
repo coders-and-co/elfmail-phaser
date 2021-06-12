@@ -1,38 +1,32 @@
-import BaseState from './BaseState';
+import BaseState, { StateReturn } from './BaseState'
 import IdleState from './IdleState';
 import FallState from './FallState';
-import Misty from '../objects/Misty';
 
+export default class JumpState extends BaseState {
 
-export default class JumpState implements BaseState {
+    name = 'jump';
 
-    sprite: Misty;
-
-    constructor(sprite: Misty, cursors:  Phaser.Types.Input.Keyboard.CursorKeys) {
-        this.sprite = sprite;
+    enter() {
         this.sprite.anims.play('misty_jump', true);
-        this.sprite.body.setVelocityY(-800);
+        this.sprite.body.setVelocityY(-this.sprite.jumpPower);
     }
 
-    update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): BaseState|void {
-        if (cursors.left.isDown) {
-            this.sprite.setFlip(true, false);
-            this.sprite.body.setVelocityX(-this.sprite.runSpeed);
-        }
-        if (cursors.right.isDown) {
-            this.sprite.setFlip(false, false);
-            this.sprite.body.setVelocityX(this.sprite.runSpeed);
-        }
+    update(): StateReturn|void {
         if (this.sprite.body.velocity.y > 0) {
-            return new FallState(this.sprite, cursors);
-        }
-        if (!cursors.right.isDown && !cursors.left.isDown) {
-            this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
-        }
-        // Keep this state in case you jump directly to a platform and never attain + velocity
-        if (this.sprite.body.onFloor()) {
-            return new IdleState(this.sprite);
+            return { type: FallState };
+        } else if (this.sprite.body.onFloor()) {
+            // Keep this state in case you jump directly to a platform and never attain + velocity
+            return { type: IdleState };
+        } else {
+            if (this.cursors.left.isDown) {
+                this.sprite.setFlip(true, false);
+                this.sprite.body.setVelocityX(-this.sprite.runSpeed);
+            } else if (this.cursors.right.isDown) {
+                this.sprite.setFlip(false, false);
+                this.sprite.body.setVelocityX(this.sprite.runSpeed);
+            } else {
+                this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
+            }
         }
     }
-
 }

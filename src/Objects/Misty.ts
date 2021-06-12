@@ -32,10 +32,6 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         this.body.setSize(40,90);
         this.body.setOffset(30,60);
 
-        // set initial MovementState
-        // this.movementState = new IdleState(this, cursors);
-        this.changeState({type: IdleState});
-
         // Create animations
         this.anims.create({
             key: 'misty_idle',
@@ -64,10 +60,14 @@ export default class Misty extends Phaser.GameObjects.Sprite {
             repeat: -1
         });
 
+        // set initial MovementState
+        // this.movementState = new IdleState(this, cursors);
+        this.changeState({type: IdleState});
+
     }
 
     changeState(nextState: StateReturn) {
-        console.log(nextState.type.name);
+        // console.log(nextState.type.name);
         if (this.movementState != null) {
             this.movementState.exit();
         }

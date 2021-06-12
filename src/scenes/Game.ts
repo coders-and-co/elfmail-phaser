@@ -15,7 +15,7 @@ export default class Demo extends Phaser.Scene {
   preload() {
     this.load.tilemapTiledJSON('tilemap', 'assets/test-map.json');
     this.load.image('base_tiles', 'assets/tiles_sheet.png');
-    this.load.spritesheet('misty', 'assets/player_sheet.png', {frameWidth: 70, frameHeight: 100});
+    this.load.spritesheet('misty', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
   }
   create() {
 
@@ -56,6 +56,25 @@ export default class Demo extends Phaser.Scene {
     // };
 
     //this.controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('misty', { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('misty', { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'turn',
+      frames: [ { key: 'misty', frame: 0 } ],
+      frameRate: 20
+    });
 
   }
 
@@ -65,12 +84,14 @@ export default class Demo extends Phaser.Scene {
     {
       console.log('leftt');
       this.misty.body.setVelocityX(-160);
+      this.misty.setFlip(true, false);
 
       this.misty.anims.play('left', true);
     }
     else if (this.cursors.right.isDown)
     {
       this.misty.body.setVelocityX(160);
+      this.misty.setFlip(false, false);
 
       this.misty.anims.play('right', true);
     }

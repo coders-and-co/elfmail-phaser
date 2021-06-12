@@ -16,11 +16,9 @@ export default class IdleState extends BaseState {
         if (this.cursors.space.isDown && this.sprite.body.onFloor()) {
             return { type: JumpState };
         } else if (this.cursors.left.isDown) {
-            return { type: RunState };
-                // { direction: Direction.Left });
+            return { type: RunState, params: { direction: Direction.Left }};
         } else if (this.cursors.right.isDown) {
-            return { type: RunState };
-            // (this.sprite, { direction: Direction.Right });
+            return { type: RunState, params: { direction: Direction.Right }};
         }
     }
 }

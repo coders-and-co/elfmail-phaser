@@ -42,7 +42,6 @@ export default class Demo extends Phaser.Scene {
         fgLayer.setCollisionByExclusion([-1], true);
 
         // Misty should collide with the the foreground map layer
-        // TODO: perhaps use a collision layer
         this.physics.add.collider(this.misty, fgLayer);
 
         // Camera and Physics Bounds
@@ -51,7 +50,6 @@ export default class Demo extends Phaser.Scene {
         this.cameras.main.startFollow(this.misty);
 
         // Starry Background
-        // this.add.image(0, 0, 'sky').setOrigin(0, 0);
         const bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'sky');
         bg.setDepth(-2);
         bg.setScrollFactor(bg.width / (map.widthInPixels * 5), 0.04);
@@ -64,7 +62,7 @@ export default class Demo extends Phaser.Scene {
         const nextState = this.misty.movementState!.update();
         if (nextState) {
             console.log(nextState.type.name);
-            if (this.misty.movementState) {
+            if (this.misty.movementState != null) {
                 this.misty.movementState.exit();
             }
             this.misty.movementState = new nextState.type(this.misty, this.cursors);

@@ -2,16 +2,13 @@ import Phaser, { Scene } from 'phaser';
 import BaseState from '../states/BaseState';
 import IdleState from '../states/IdleState';
 
-type SpriteWithDynamicBody = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-
 export default class Misty extends Phaser.GameObjects.Sprite {
 
     movementState: BaseState|null = null;
-    body!: Phaser.Physics.Arcade.Body;
+    body: Phaser.Physics.Arcade.Body;
 
     runSpeed = 500;
     jumpPower = 800;
-
 
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
 
@@ -61,5 +58,4 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         });
 
     }
-
 }

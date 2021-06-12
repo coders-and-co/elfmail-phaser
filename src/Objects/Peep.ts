@@ -2,36 +2,24 @@ import Phaser, { Scene } from 'phaser';
 import BaseState from '../states/BaseState';
 import IdleState from '../states/IdleState';
 
-export enum LetterTypes {
-    love = 0,
-    work = 1,
-    meme = 2,
-    canine = 3
-}
-export enum LetterStates {
-    waiting = 0,
-    pickedUp = 1,
-    delivered = 2,
-}
-export default class Letter extends Phaser.GameObjects.Sprite {
+export default class Peep extends Phaser.GameObjects.Sprite {
 
     body: Phaser.Physics.Arcade.StaticBody;
-    deliveryState: LetterStates|null = null;
+    sender: boolean;
     world: Phaser.Physics.Arcade.World|null = null;
     id: number;
-    letterType: LetterTypes|null = null;
     coordinates = {
         x: 0,
         y: 0,
     }
 
-    constructor(scene:Scene, world: Phaser.Physics.Arcade.World, x: number, y: number, texture: string, id: number, letterType: LetterTypes, frame?: number ) {
+    constructor(scene:Scene, world: Phaser.Physics.Arcade.World, x: number, y: number, texture: string, id: number, sender: boolean, frame?: number) {
 
-    super(scene, x, y, texture, frame); // The frame is optional
+        super(scene, x, y, texture, frame); // The frame is optional
 
         this.world = world;
         this.id = id;
-        this.deliveryState = LetterStates.waiting;
+        this.sender = sender;
         // add letter to the scene
         scene.add.existing(this); // add letter to this scene
 

@@ -21,6 +21,7 @@ export default class RunState implements BaseState {
             this.sprite.setFlip(true, false);
             this.sprite.anims.play('left', true);
         } else {
+            // console.log(sprite.runSpeed);
             this.sprite.body.setVelocityX(sprite.runSpeed);
             this.sprite.setFlip(false, false);
             this.sprite.anims.play('right', true);

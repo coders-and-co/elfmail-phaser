@@ -8,7 +8,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     movementState: BaseState|null = null;
     body: any;
-    runSpeed = 320;
+    runSpeed = 500;
 
     constructor(scene:Scene, x: number, y: number, texture: string, frame?: number) {
         super(scene, x, y, texture, frame); // The frame is optional

@@ -18,7 +18,6 @@ export default class Demo extends Phaser.Scene {
     this.load.image('base_tiles', 'assets/tiles_sheet.png');
     this.load.spritesheet('misty', 'assets/run_animation.png', {frameWidth: 100, frameHeight: 150});
     this.load.spritesheet('misty_stand', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
-
   }
   create() {
     this.add.image(0, 0, 'sky').setOrigin(0, 0);
@@ -48,16 +47,6 @@ export default class Demo extends Phaser.Scene {
 
     // var cursors = this.input.keyboard.createCursorKeys();
     this.cursors = this.input.keyboard.createCursorKeys();
-
-
-    // var controlConfig = {
-    //   camera: this.cameras.main,
-    //   left: cursors.left,
-    //   right: cursors.right,
-    //   up: cursors.up,
-    //   down: cursors.down,
-    //   speed: 5.0
-    // };
 
     //this.controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
     this.anims.create({
@@ -95,5 +84,4 @@ export default class Demo extends Phaser.Scene {
     }
 
   }
-
 }

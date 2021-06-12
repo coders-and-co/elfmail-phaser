@@ -1,5 +1,5 @@
 import Phaser, { GameObjects } from 'phaser';
-import Misty from '../objects/Misty';
+import Misty from '../Objects/Misty';
 
 export interface StateReturn {
     type: typeof BaseState;

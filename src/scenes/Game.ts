@@ -2,12 +2,22 @@ import Phaser from 'phaser';
 import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
 // import City from "../city";
+import Peep from "../Objects/Peep";
+
+export interface Delivery {
+    sender: Peep,
+    receiver: Peep,
+    letter: Letter,
+    message: string,
+    state: 'waiting' | 'pickedUp' | 'delivered',
+}
 
 export default class Demo extends Phaser.Scene {
 
     misty!: Misty;
     letter!: Letter;
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+    deliveries!: Delivery[];
 
     constructor() {
         super('GameScene');
@@ -24,7 +34,9 @@ export default class Demo extends Phaser.Scene {
         this.load.spritesheet('misty_idle', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_fall', 'assets/fall_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_jump', 'assets/jump_animation.png', {frameWidth: 100, frameHeight: 150});
-        this.load.spritesheet('letter', 'assets/letter.png', {frameWidth: 100, frameHeight: 100});
+        this.load.image('letter', 'assets/letter.png');
+        this.load.image('computer_peep', 'assets/peeps/computer_peep.png');
+        this.load.image('phone_peep', 'assets/peeps/phone_peep.png');
     }
 
     create() {
@@ -37,6 +49,14 @@ export default class Demo extends Phaser.Scene {
         this.misty = new Misty(this, this.physics.world, this.cursors, 200, 9500, 'misty_idle');
 
         // letter
+        this.deliveries = [];
+        this.deliveries.push({
+            sender: new Peep(this, this.physics.world, 300, 9500, 'computer_peep', 1, true),
+            receiver: new Peep(this, this.physics.world, 300, 9500, 'phone_peep', 1, true),
+            letter: new Letter(this, this.physics.world, 400, 9500, 'letter', 1, LetterTypes.love),
+            message: 'watermelons on sale',
+            state: 'waiting',
+        })
         this.letter = new Letter(this, this.physics.world, 300, 9500, 'letter', 1, LetterTypes.love);
 
         // Load Tilemap
@@ -77,7 +97,7 @@ export default class Demo extends Phaser.Scene {
 
         // Misty should collide with the the foreground map layer
         this.physics.add.collider(this.misty, tileLayers[1]);
-        this.physics.add.collider(this.letter, this.misty, this.letter.collected, undefined, this);
+        this.physics.add.overlap(this.letter, this.misty, this.letter.collected, undefined, this.letter);
 
         // Camera and Physics Bounds
         this.physics.world.setBounds(0, 0, city.widthInPixels, city.heightInPixels);

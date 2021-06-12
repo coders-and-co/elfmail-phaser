@@ -46,7 +46,7 @@ export default class Demo extends Phaser.Scene {
         // this.load.image('test_tiles', 'assets/tiles_sheet.png');
         this.load.image('city_tiles', 'assets/Tileset/tileset_city.png');
         this.load.spritesheet('misty_run', 'assets/run_animation.png', {frameWidth: 100, frameHeight: 150});
-        this.load.spritesheet('misty_idle', 'assets/misty_testanim.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_idle', 'assets/misty_animations/idle_animation_blink.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_fall', 'assets/fall_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_jump', 'assets/jump_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.image('letter', 'assets/letter.png');

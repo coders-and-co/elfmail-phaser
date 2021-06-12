@@ -35,8 +35,9 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         // Create animations
         this.anims.create({
             key: 'misty_idle',
-            frames: [ { key: 'misty_idle', frame: 0 } ],
-            frameRate: 20
+            frames: this.anims.generateFrameNumbers('misty_idle', { start: 0, end: 7 }),
+            frameRate: 4,
+            repeat: -1
         });
 
         this.anims.create({

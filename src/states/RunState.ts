@@ -16,15 +16,13 @@ export default class RunState implements BaseState {
     constructor(sprite: Misty, direction: Direction) {
         this.sprite = sprite;
         this.direction = direction;
+        this.sprite.anims.play('misty_run', true);
         if (direction == Direction.Left) {
             this.sprite.body.setVelocityX(sprite.runSpeed * -1);
             this.sprite.setFlip(true, false);
-            this.sprite.anims.play('left', true);
         } else {
-            // console.log(sprite.runSpeed);
             this.sprite.body.setVelocityX(sprite.runSpeed);
             this.sprite.setFlip(false, false);
-            this.sprite.anims.play('right', true);
         }
     }
 

@@ -2,7 +2,6 @@ import BaseState from './BaseState'
 import RunState, { Direction } from './RunState'
 import Misty from '../objects/Misty';
 import JumpState from "./JumpState";
-// import JumpState from './JumpState'
 
 export default class IdleState implements BaseState {
 
@@ -11,7 +10,7 @@ export default class IdleState implements BaseState {
     constructor(sprite: Misty) {
         this.sprite = sprite;
         this.sprite.body.setVelocityX(0);
-        this.sprite.anims.play('turn', true);
+        this.sprite.anims.play('misty_idle', true);
     }
 
     update(cursors: Phaser.Types.Input.Keyboard.CursorKeys): BaseState|void {
@@ -25,5 +24,4 @@ export default class IdleState implements BaseState {
             return new JumpState(this.sprite, cursors);
         }
     }
-
 }

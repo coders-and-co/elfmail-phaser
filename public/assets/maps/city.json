@@ -137,7 +137,7 @@
         {
          "columns":12,
          "firstgid":1,
-         "image":"tiles_sheet.png",
+         "image":"..\/tiles_sheet.png",
          "imageheight":1300,
          "imagewidth":1269,
          "margin":0,

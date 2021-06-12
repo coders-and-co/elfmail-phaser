@@ -31,7 +31,7 @@ export default class JumpState extends BaseState {
                 this.sprite.setFlip(false, false);
                 this.sprite.body.setVelocityX(this.sprite.runSpeed);
             } else {
-                this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
+                this.sprite.body.velocity.x *= 0.90;
             }
         }
     }

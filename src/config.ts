@@ -5,8 +5,8 @@ export default {
   parent: 'game',
   backgroundColor: '#33A5E7',
   scale: {
-    width: 1280,
-    height: 960,
+    width: 1920,
+    height: 1080,
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },

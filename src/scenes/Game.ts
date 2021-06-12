@@ -35,8 +35,8 @@ export default class Demo extends Phaser.Scene {
         this.load.spritesheet('misty_fall', 'assets/fall_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_jump', 'assets/jump_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.image('letter', 'assets/letter.png');
-        this.load.image('computer_peep', 'assets/peeps/computer_peep.png');
-        this.load.image('phone_peep', 'assets/peeps/phone_peep.png');
+        this.load.spritesheet('computer_peep', 'assets/peeps/computer_peep.png', {frameWidth: 200, frameHeight: 200});
+        this.load.spritesheet('phone_peep', 'assets/peeps/phone_peep.png', {frameWidth: 200, frameHeight: 200});
     }
 
     create() {
@@ -51,13 +51,17 @@ export default class Demo extends Phaser.Scene {
         // letter
         this.deliveries = [];
         this.deliveries.push({
-            sender: new Peep(this, this.physics.world, 300, 9500, 'computer_peep', 1, true),
-            receiver: new Peep(this, this.physics.world, 300, 9500, 'phone_peep', 1, true),
-            letter: new Letter(this, this.physics.world, 400, 9500, 'letter', 1, LetterTypes.love),
+            sender: new Peep(this, this.physics.world, 800, 9000, 'computer_peep', 1, true),
+            receiver: new Peep(this, this.physics.world, 1100, 8700, 'phone_peep', 1, false),
+            letter: new Letter(this, this.physics.world, 800, 8900, 'letter', 1, LetterTypes.love),
             message: 'watermelons on sale',
             state: 'waiting',
         })
-        this.letter = new Letter(this, this.physics.world, 300, 9500, 'letter', 1, LetterTypes.love);
+        this.deliveries.forEach((delivery) => {
+            console.log('delivery', delivery);
+            this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, delivery);
+        })
+        //this.letter = new Letter(this, this.physics.world, 300, 9000, 'letter', 1, LetterTypes.love);
 
         // Load Tilemap
         const city = this.make.tilemap({ key: 'city_tilemap' });
@@ -97,7 +101,7 @@ export default class Demo extends Phaser.Scene {
 
         // Misty should collide with the the foreground map layer
         this.physics.add.collider(this.misty, tileLayers[1]);
-        this.physics.add.overlap(this.letter, this.misty, this.letter.collected, undefined, this.letter);
+        //this.physics.add.overlap(this.letter, this.misty, this.letter.collected, undefined, this.letter);
 
         // Camera and Physics Bounds
         this.physics.world.setBounds(0, 0, city.widthInPixels, city.heightInPixels);
@@ -124,4 +128,17 @@ export default class Demo extends Phaser.Scene {
             this.misty.movementState.enter(nextState.params || {});
         }
     }
+
+    collected(){
+        console.log('this in collected')
+        console.log(this.sender);
+        //this.sender.setTexture('computer_peep',1)
+        console.log(this.sender.texture);
+        this.sender.destroy();
+        this.letter.destroy();
+        //this.scene.add.existing(this.receiver);
+        // new peeps image
+
+    }
+
 }

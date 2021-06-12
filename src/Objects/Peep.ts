@@ -17,6 +17,8 @@ export default class Peep extends Phaser.GameObjects.Sprite {
 
         super(scene, x, y, texture, frame); // The frame is optional
 
+        // this.setOrigin(0, 0);
+
         this.world = world;
         this.id = id;
         this.sender = sender;
@@ -31,8 +33,8 @@ export default class Peep extends Phaser.GameObjects.Sprite {
 
         // set letter''s collision properties
         // this.body.setCollideWorldBounds(true);
-        this.body.setSize(90,73);
-        this.body.setOffset(5,15);
+        this.body.setSize(200, 200);
+        // this.body.setOffset(5,15);
         this.setDepth(0);
 
         this.anims.create({

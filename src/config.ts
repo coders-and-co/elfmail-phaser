@@ -9,5 +9,13 @@ export default {
     height: 960,
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
-  }
+  },
+  physics: {
+    default: 'arcade',
+    arcade: {
+        gravity: { y: 300 },
+        debug: true
+    }
+  },
+
 };

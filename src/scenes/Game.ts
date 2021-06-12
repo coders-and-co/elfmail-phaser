@@ -13,14 +13,13 @@ export default class Demo extends Phaser.Scene {
   preload() {
     this.load.tilemapTiledJSON('tilemap', 'assets/test-map.json');
     this.load.image('base_tiles', 'assets/tiles_sheet.png');
-    this.load.image('misty', 'assets/player_sheet.png');
+    this.load.spritesheet('misty', 'assets/player_sheet.png', {frameWidth: 70, frameHeight: 100});
   }
 
   create() {
-    //const player = new Misty(this,500,9800,'misty',)
-    const player = this.physics.add.sprite(500, 9800, 'misty');
-    player.setCollideWorldBounds(true);
 
+    // const player = this.add.sprite(200, 7700, 'misty');
+    const player = this.physics.add.sprite(200, 7700, 'misty');
 
     // create the Tilemap
     const map = this.make.tilemap({ key: 'tilemap' })
@@ -28,9 +27,12 @@ export default class Demo extends Phaser.Scene {
     // add the tileset image we are using
     const tileset = map.addTilesetImage('tiles_sheet', 'base_tiles')
     map.createLayer('Tile Layer 1', tileset);
+    // map.setCollision([0])
+    map.setCollisionByExclusion([0, -1], true);
+
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    this.cameras.main.setScroll(0, 100000);
+    this.cameras.main.setScroll(0, 10000);
     var cursors = this.input.keyboard.createCursorKeys();
 
     var controlConfig = {

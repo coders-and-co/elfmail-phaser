@@ -14,8 +14,8 @@ export default {
     default: 'arcade',
     arcade: {
         tileBias: 100,
-        gravity: { y: 1000 },
-        debug: true,
+        gravity: { y: 1200 },
+        debug: false,
     }
   },
 

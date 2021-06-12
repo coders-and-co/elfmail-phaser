@@ -18,6 +18,12 @@ export default class JumpState extends BaseState {
             // Keep this state in case you jump directly to a platform and never attain + velocity
             return { type: IdleState };
         } else {
+
+            if (!this.cursors.space.isDown) {
+                // decay jump when space released
+                this.sprite.body.velocity.y *= 0.90;
+            }
+
             if (this.cursors.left.isDown) {
                 this.sprite.setFlip(true, false);
                 this.sprite.body.setVelocityX(-this.sprite.runSpeed);

@@ -11,7 +11,7 @@ export default class Demo extends Phaser.Scene {
 
   preload() {
     this.load.tilemapTiledJSON('tilemap', 'assets/test-map.json');
-    this.load.image('base_tiles', 'assets/spritesheet.png');
+    this.load.image('base_tiles', 'assets/tiles_sheet.png');
   }
 
   create() {
@@ -20,10 +20,11 @@ export default class Demo extends Phaser.Scene {
     const map = this.make.tilemap({ key: 'tilemap' })
 
     // add the tileset image we are using
-    const tileset = map.addTilesetImage('spritesheet', 'base_tiles')
+    const tileset = map.addTilesetImage('tiles_sheet', 'base_tiles')
     map.createLayer('Tile Layer 1', tileset);
 
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.cameras.main.setScroll(0, 100000);
     var cursors = this.input.keyboard.createCursorKeys();
 
     var controlConfig = {
@@ -32,7 +33,7 @@ export default class Demo extends Phaser.Scene {
       right: cursors.right,
       up: cursors.up,
       down: cursors.down,
-      speed: 1.0
+      speed: 5.0
     };
 
     this.controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);

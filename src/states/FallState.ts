@@ -7,15 +7,17 @@ import SlideState from "./SlideState";
 export default class FallState extends BaseState {
 
     name = 'fall';
-    graceFrames = 0;
+    graceJumpTimer = 0;
     fallThruTimer = 0;
 
-    enter(params: { graceFrames: number, fallThru: boolean }) {
+    enter(params: { graceJump: boolean, fallThru: boolean }) {
         this.sprite.anims.play('misty_fall', true);
-        this.graceFrames = params.graceFrames;
+        if (params.graceJump) {
+            this.graceJumpTimer = this.sprite.graceJumpTimer;
+        }
         if (params.fallThru) {
             this.sprite.fallThru = true;
-            this.fallThruTimer = 50;
+            this.fallThruTimer = this.sprite.fallThruTimer;
         } else {
             this.sprite.fallThru = false;
         }
@@ -25,22 +27,22 @@ export default class FallState extends BaseState {
         this.sprite.fallThru = false;
     }
 
-    update(): StateReturn|void {
+    update(delta: number): StateReturn|void {
 
         if (this.fallThruTimer > 0) {
-            this.fallThruTimer--;
-            if (this.fallThruTimer == 0) {
+            this.fallThruTimer -= delta;
+            if (this.fallThruTimer <= 0) {
                 this.sprite.fallThru = false;
             }
         }
 
-        if (this.graceFrames > 0) {
-            this.graceFrames--;
+        if (this.graceJumpTimer > 0) {
+            this.graceJumpTimer -= delta;
         }
 
 
         if (this.sprite.jumpJustPressed) {
-            if (this.graceFrames > 0) {
+            if (this.graceJumpTimer > 0) {
                 return { type: JumpState };
             } else if (this.sprite.hasDoubleJump) {
                 return { type: JumpState, params: { isDouble: true }};

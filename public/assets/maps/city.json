@@ -397,6 +397,42 @@
                  "width":0,
                  "x":6800,
                  "y":4900
+                }, 
+                {
+                 "height":0,
+                 "id":42,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"bird",
+                 "visible":true,
+                 "width":0,
+                 "x":5000,
+                 "y":4100
+                }, 
+                {
+                 "height":0,
+                 "id":43,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"bird",
+                 "visible":true,
+                 "width":0,
+                 "x":3700,
+                 "y":4525
+                }, 
+                {
+                 "height":0,
+                 "id":44,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"bird",
+                 "visible":true,
+                 "width":0,
+                 "x":6375,
+                 "y":5200
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -405,7 +441,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":42,
+ "nextobjectid":45,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.7.0",

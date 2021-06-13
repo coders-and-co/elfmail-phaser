@@ -25,7 +25,7 @@ export default class BaseState {
 
     }
 
-    update(): StateReturn|void {
+    update(delta: number): StateReturn|void {
 
     }
 

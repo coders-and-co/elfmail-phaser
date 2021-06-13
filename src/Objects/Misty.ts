@@ -13,10 +13,12 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     jumpJustPressed = false;
     hasDoubleJump = false;
     fallThru = false;
+    graceJumpTimer = 120; // ms
+    fallThruTimer = 333; // ms
 
     touchingWire: Phaser.GameObjects.Line|null = null;
 
-    graceFrames = 10;
+
 
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
 
@@ -107,7 +109,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     update(time: number, delta: number) {
 
         // Update MovementState and respond to state changes
-        const nextState = this.movementState!.update();
+        const nextState = this.movementState!.update(delta);
         if (nextState) {
             this.changeState(nextState);
         }
@@ -115,9 +117,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     }
 
     handleJump() {
-        // console.log('SPACE!');
         this.jumpJustPressed = true;
-        // console.log(this);
     }
 
     changeState(nextState: StateReturn) {

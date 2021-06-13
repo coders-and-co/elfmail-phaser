@@ -185,14 +185,24 @@ export default class Demo extends Phaser.Scene {
         const triggers = city.getObjectLayer('Spawn Triggers');
 
         for (const t of triggers.objects) {
-            if (t.rectangle && t.type == 'window') {
-                if (t.x && t.y) {
+
+            if (!t.x || !t.y) {
+                continue;
+            }
+
+            switch (t.type) {
+
+                case 'player':
+                    this.misty.setPosition(t.x, t.y);
+                    break;
+                case 'window':
                     this.windowLocations.push({x: t.x + 100, y: t.y + 100});
-                }
+                    break;
+                case 'bird':
+                    this.add.circle(t.x, t.y, 15, 0xFF0000);
+                    break;
             }
-            if (t.point && t.type == 'player') {
-                this.misty.setPosition(t.x, t.y);
-            }
+
         }
 
         // spawn letters

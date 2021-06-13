@@ -223,6 +223,8 @@ export default class ElfMail extends Phaser.Scene {
             }
         }
 
+        // clear window locations
+        this.windowLocations = [];
 
         // process spawn triggers
         const triggers = city.getObjectLayer('Spawn Triggers');
@@ -345,7 +347,9 @@ export default class ElfMail extends Phaser.Scene {
 
         this[0].misty.exclaim('misty_collect');
         this[0].playSound('collect')
+
         this[0].windowLocations.push({x: this[1].sender.x, y: this[1].sender.y})
+
         this[1].sender.destroy();
         this[1].letter.body.enable = false;
         this[1].letter.anims.play('letter_get', true);

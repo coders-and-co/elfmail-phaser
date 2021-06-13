@@ -59,6 +59,7 @@ export default class ElfMail extends Phaser.Scene {
 
         //this.load.text('messages', 'assets/letter/Messages_for_Misty');
         this.load.audio('theme', 'assets/sound/elfmail_theme.mp3');
+        this.load.audio('theme-tutorial', 'assets/sound/elfmail_tutorial_song.mp3');
         this.load.audio('collect', 'assets/sound/elfmail_collect.mp3');
         this.load.audio('deliver', 'assets/sound/elfmail_deliver.mp3');
         this.load.audio('jump', 'assets/sound/elfmail_jump.mp3');
@@ -79,9 +80,6 @@ export default class ElfMail extends Phaser.Scene {
 
         const peep1 = Math.floor(Math.random() * 4);
         const peep2 = Math.floor(Math.random() * 4);
-        // console.log(peep1, peep2)
-        // console.log(peep1*2, peep2*2)
-
 
         if (this.messages.length == 0) {
             this.messages = [...this.usedMessages];
@@ -112,14 +110,9 @@ export default class ElfMail extends Phaser.Scene {
     create() {
 
         this.messages = (this.cache.text.get('messages') as string).split('\n');
-        // console.log(messages);
 
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
-        // this.letterMessages = fetch('Messages_for_Misty.txt')
-        //     .then(response => {return [response.text()]})
-        //     .then(text => console.log(text))
-        // console.log(this.letterMessages);
 
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
@@ -131,7 +124,12 @@ export default class ElfMail extends Phaser.Scene {
 
         this.ui.misty = this.misty;
 
-        this.themeMusic = this.sound.add('theme');
+        if(this.tutorial) {
+            this.themeMusic = this.sound.add('theme-tutorial');
+        } else {
+            this.themeMusic = this.sound.add('theme');
+        }
+
         this.themeMusic.play({
             loop: true
         });
@@ -211,6 +209,7 @@ export default class ElfMail extends Phaser.Scene {
             }
         }
 
+
         // process spawn triggers
         const triggers = city.getObjectLayer('Spawn Triggers');
         if (triggers) {
@@ -218,17 +217,16 @@ export default class ElfMail extends Phaser.Scene {
                 if (!t.x || !t.y) continue;
                 switch (t.type) {
 
-                    case 'player':
-                        this.misty.setPosition(t.x, t.y);
-                        break;
-                    case 'window':
-                        console.log('Window!');
-                        this.windowLocations.push({x: t.x + 100, y: t.y + 100});
-                        break;
-                    case 'bird':
-                        var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1);
-                        this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
-                        break;
+                case 'player':
+                    this.misty.setPosition(t.x, t.y);
+                    break;
+                case 'window':
+                    this.windowLocations.push({x: t.x + 100, y: t.y + 100});
+                    break;
+                case 'bird':
+                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1, t.name == 'right');
+                    this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
+                    break;
                 }
 
             }
@@ -342,7 +340,11 @@ export default class ElfMail extends Phaser.Scene {
             this[0].ui.updateScore(this[0].score);
             this[0].misty.exclaim('misty_deliver', 1000);
             this[0].playSound('deliver')
-            this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
+            var ref = this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
+            var timer = this[0].misty.scene.time.delayedCall(5000, function(){
+                ref.destroy();
+            }, undefined, this);
+
             // create new delivery to replaced completed one
             this[0].addNewDelivery();
             // add window location back

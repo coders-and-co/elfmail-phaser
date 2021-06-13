@@ -1,4 +1,4 @@
-import Phaser, { GameObjects } from 'phaser';
+import Phaser, { Physics } from 'phaser';
 import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
 // import City from "../city";
@@ -31,12 +31,17 @@ export default class Demo extends Phaser.Scene {
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     deliveries: Delivery[] = [];
     windowLocations: Point[] = [];
+    letterMessages: any;
+    themeMusic: any;
+    score: number = 0;
+    scoreText!: any;
 
     constructor() {
         super('GameScene');
     }
 
     preload() {
+        // this.load.scenePlugin('Slopes', Slopes);
         // map
         this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/city.json');
         // images
@@ -48,10 +53,19 @@ export default class Demo extends Phaser.Scene {
         this.load.spritesheet('misty_fall', 'assets/misty_animations/fall_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_jump', 'assets/misty_animations/jump_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_double_jump', 'assets/misty_animations/double_jump_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_slide', 'assets/misty_animations/slide_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_collect', 'assets/misty_animations/collect_animation.png', {frameWidth: 100, frameHeight: 150});
 
-        this.load.image('letter', 'assets/letter.png');
+        this.load.image('letter', 'assets/letter/letter.png');
         this.load.spritesheet('computer_peep', 'assets/peeps/computer_peep.png', {frameWidth: 200, frameHeight: 200});
         this.load.spritesheet('phone_peep', 'assets/peeps/phone_peep.png', {frameWidth: 200, frameHeight: 200});
+        //this.load.text('messages', 'assets/letter/Messages_for_Misty');
+        this.load.audio('theme', 'assets/sound/elfmail_theme.mp3');
+        this.load.audio('collect', 'assets/sound/elfmail_collect.mp3');
+        this.load.audio('deliver', 'assets/sound/elfmail_deliver.mp3');
+        this.load.audio('jump', 'assets/sound/elfmail_jump.mp3');
+        this.load.audio('doublejump', 'assets/sound/elfmail_doublejump.mp3');
+        this.load.audio('landing', 'assets/sound/elfmail_landing.mp3', { volume: 0.00001 });
     }
 
     addNewDelivery() {
@@ -77,18 +91,28 @@ export default class Demo extends Phaser.Scene {
 
         console.log('delivery', delivery);
         console.log(this.deliveries.length);
-        this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, delivery);
+        this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, [this, delivery]);
         this.physics.add.overlap(delivery.receiver, this.misty, this.deliver, undefined, [this, delivery]);
     }
 
     create() {
-
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
+        // this.letterMessages = fetch('Messages_for_Misty.txt')
+        //     .then(response => {return [response.text()]})
+        //     .then(text => console.log(text))
+        // console.log(this.letterMessages);
+
 
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
         this.misty = new Misty(this, this.physics.world, this.cursors, 200, 9500, 'misty_idle');
+        this.themeMusic = this.sound.add('theme');
+        this.themeMusic.play({
+            loop: true
+        });
+        console.log(this.cameras.main.x, this.cameras.main.y)
+        this.scoreText = this.add.text(this.cameras.main.midPoint.x + 800, this.cameras.main.midPoint.y - 500, 'score', { fontFamily: 'Courier', fontSize: '30px'});
 
 
 
@@ -124,13 +148,48 @@ export default class Demo extends Phaser.Scene {
             city.createLayer('Overlay Tiles', base_tileset),
         ]
 
+        // process wires
+        const wires = city.getObjectLayer('Wires');
+        for (const w of wires.objects) {
+            console.log(w);
+            if (w.type == 'wire' && w.polyline && w.x && w.y) {
+                const points: {x: number, y: number}[] = [];
+                let ox = city.widthInPixels;
+                let oy = city.heightInPixels;
+                for (let p of w.polyline) {
+                    if (typeof p.x !== 'undefined' && typeof p.y !== 'undefined') {
+                        let point = {x: w.x + p.x, y: w.y + p.y};
+                        ox = Math.min(ox, point.x);
+                        oy = Math.min(oy, point.y);
+                        points.push(point);
+                    }
+                }
+                let tp = points.map((p) => ({x: p.x - ox, y: p.y - oy}));
+                let wire = this.add.line(ox, oy, tp[0].x, tp[0].y, tp[1].x, tp[1].y);
+                // polygon(ox, oy, translatedPoints);
+                wire.setOrigin(0, 0);
+                wire.setStrokeStyle(5, 0xFFFFFF);
+                wire.setLineWidth(5);
+
+                this.physics.add.existing(wire, true);
+                this.physics.add.collider(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
+                this.physics.add.overlap(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
+
+            }
+        }
+
+
         // process spawn triggers
         const triggers = city.getObjectLayer('Spawn Triggers');
+
         for (const t of triggers.objects) {
             if (t.rectangle && t.type == 'window') {
                 if (t.x && t.y) {
                     this.windowLocations.push({x: t.x + 100, y: t.y + 100});
                 }
+            }
+            if (t.point && t.type == 'player') {
+                this.misty.setPosition(t.x, t.y);
             }
         }
 
@@ -163,14 +222,49 @@ export default class Demo extends Phaser.Scene {
 
     }
 
+    physicsProcessWire(misty: Phaser.Types.Physics.Arcade.GameObjectWithBody, wire: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
+
+        let wireGeom = (wire as Phaser.GameObjects.Line).geom as Phaser.Geom.Line;
+        let wireLine = new Phaser.Geom.Line(
+            wire.body.x + wireGeom.x1,
+            wire.body.y + wireGeom.y1,
+            wire.body.x + wireGeom.x2,
+            wire.body.y + wireGeom.y2
+        );
+        let mistyRect = new Phaser.Geom.Rectangle(
+            misty.body.left, misty.body.top, misty.body.width, misty.body.height
+        )
+        const isColliding = Phaser.Geom.Intersects.LineToRectangle(wireLine, mistyRect);
+        if (isColliding) {
+            (misty as Misty).touchingWire = wire as Phaser.GameObjects.Line;
+        } else {
+            (misty as Misty).touchingWire = null;
+        }
+        return isColliding;
+    }
+
+    physicsCollideWire(misty: Phaser.Types.Physics.Arcade.GameObjectWithBody, wire: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
+        // let w = (wire as Phaser.GameObjects.Line)
+        // let wireGeom = w.geom as Phaser.Geom.Line;
+        // let y1 = wire.body.y + wireGeom.y1;
+        // let y2 = wire.body.y + wireGeom.y2;
+        // let factor = (misty.body.x - wire.body.x) / (wire.body.width);
+        // // interpolate
+        // let y = y1 + ((y2-y1) * factor);
+        // misty.body.stop();
+        // misty.body.y = y - misty.body.height;
+    }
+
     physicsCollisionPlatform(obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
 
     }
 
-    physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Tilemaps.Tile) {
+    physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
 
-        if (this == obj1 && [9, 10, 11].includes(obj2.index)) {
-            if(obj1.body.velocity.y <= 0 && obj2.faceTop && obj1.body.bottom > obj2.getTop()) {
+        const obj2Tile = (obj2 as unknown) as Phaser.Tilemaps.Tile;
+
+        if (this == obj1 && [9, 10, 11].includes(obj2Tile.index)) {
+            if(obj1.body.velocity.y <= 0 && obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop()) {
                 return false;
             }
         }
@@ -180,20 +274,24 @@ export default class Demo extends Phaser.Scene {
     update(time: number, delta: number) {
 
         this.misty.update(time, delta);
+        console.log(this.cameras.main)
+        this.scoreText.x = this.cameras.main.midPoint.x + 800;
+        this.scoreText.y = this.cameras.main.midPoint.y - 500;
+
 
     }
 
-    collected(this: Delivery){
-        console.log('this in collected')
-        console.log(this.sender);
-        //this.sender.setTexture('computer_peep',1)
-        console.log(this.sender.texture);
-        this.sender.destroy();
-        this.letter.destroy();
+    collected(this: [this, Delivery]){
+        this[0].misty.exclaim();
+        this[0].playSound('collect')
+        this[1].sender.destroy();
+        this[1].letter.destroy();
     }
 
     deliver(this: [this, Delivery]) {
         if(!this[1].sender.body){
+            this[0].misty.exclaim();
+            this[0].playSound('deliver')
             this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
             // create new delivery to replaced completed one
             this[0].addNewDelivery();
@@ -204,5 +302,11 @@ export default class Demo extends Phaser.Scene {
         }
     }
 
+    playSound(name: string){
+        var soundEffect = this.sound.add(name);
+        soundEffect.play({
+            loop: false
+        });
+    }
 
 }

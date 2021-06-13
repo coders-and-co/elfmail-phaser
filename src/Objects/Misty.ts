@@ -13,9 +13,9 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     jumpJustPressed = false;
     hasDoubleJump = false;
 
+    touchingWire: Phaser.GameObjects.Line|null = null;
+
     graceFrames = 10;
-
-
 
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
 
@@ -30,9 +30,11 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         // set jump handler
         cursors.space.on('down', this.handleJump.bind(this));
 
+        // set rendering depth
+        this.setDepth(1);
+
         // add Misty to the Physics world
         this.body = new Phaser.Physics.Arcade.Body(world, this);
-        this.setDepth(1);
         world.add(this.body);
 
         // set Misty's collision properties
@@ -76,6 +78,19 @@ export default class Misty extends Phaser.GameObjects.Sprite {
             repeat: -1
         });
 
+        this.anims.create({
+            key: 'misty_slide',
+            frames: this.anims.generateFrameNumbers('misty_slide', { start: 0, end: 1 }),
+            frameRate: 15,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'misty_collect',
+            frames: this.anims.generateFrameNumbers('misty_collect', { start: 0, end: 4 }),
+            duration: 400,
+        });
+
         // set initial MovementState
         // this.movementState = new IdleState(this, cursors);
         this.changeState({type: IdleState});
@@ -105,5 +120,15 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         }
         this.movementState = new nextState.type(this, this.cursors);
         this.movementState.enter(nextState.params || {});
+    }
+
+    exclaim() {
+        this.body.moves = false;
+        this.anims.play('misty_collect', true);
+        var timer = this.scene.time.delayedCall(350, this.move, [this]);
+    }
+
+    move() {
+        arguments[0].body.moves = true;
     }
 }

@@ -107,13 +107,14 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     }
 
     update(time: number, delta: number) {
-
-        // Update MovementState and respond to state changes
-        const nextState = this.movementState!.update(delta);
-        if (nextState) {
-            this.changeState(nextState);
+        if (this.body.moves) {
+            // Update MovementState and respond to state changes
+            const nextState = this.movementState!.update(delta);
+            if (nextState) {
+                this.changeState(nextState);
+            }
+            this.jumpJustPressed = false;
         }
-        this.jumpJustPressed = false;
     }
 
     handleJump() {

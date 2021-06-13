@@ -48,16 +48,61 @@
          "encoding":"base64",
          "height":23,
          "id":3,
-         "name":"Overlay",
+         "name":"Overlay Tiles",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
          "width":37,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":5,
+         "name":"Spawn Triggers",
+         "objects":[
+                {
+                 "height":198,
+                 "id":1,
+                 "name":"sendr",
+                 "rotation":0,
+                 "type":"window",
+                 "visible":true,
+                 "width":198,
+                 "x":2200,
+                 "y":1498
+                }, 
+                {
+                 "height":200,
+                 "id":2,
+                 "name":"receivr",
+                 "rotation":0,
+                 "type":"window",
+                 "visible":true,
+                 "width":202,
+                 "x":3298,
+                 "y":196
+                }, 
+                {
+                 "height":0,
+                 "id":3,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"player",
+                 "visible":true,
+                 "width":0,
+                 "x":484.848484848485,
+                 "y":1651.51515151515
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":5,
- "nextobjectid":1,
+ "nextlayerid":7,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.7.0",
@@ -80,7 +125,6 @@
                  "objectgroup":
                     {
                      "draworder":"index",
-                     "id":2,
                      "name":"",
                      "objects":[
                             {
@@ -106,7 +150,6 @@
                  "objectgroup":
                     {
                      "draworder":"index",
-                     "id":2,
                      "name":"",
                      "objects":[
                             {

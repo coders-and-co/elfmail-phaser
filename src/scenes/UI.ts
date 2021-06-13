@@ -54,6 +54,7 @@ export default class ElfMailUI extends Phaser.Scene {
 
         let existingIndicator = this.indicators.find((x) => x.delivery == delivery);
         let texture;
+        // console.log('adding indicator', delivery.state);
         switch(delivery.state) {
             case DeliveryState.Waiting:
                 texture = 'i1';
@@ -64,18 +65,22 @@ export default class ElfMailUI extends Phaser.Scene {
                 break;
         }
 
+        const image = new Phaser.GameObjects.Image(this, 0, 0, texture);
+        image.setDepth(98);
+
         if (existingIndicator) {
             // console.log('Existing!')
-            existingIndicator.image.setTexture(texture);
+            existingIndicator.image.destroy();
+            existingIndicator.image = image;
         } else {
-            const image = new Phaser.GameObjects.Image(this, 0, 0, texture);
-            image.setDepth(98);
+
             this.indicators.push({
                 image,
                 delivery
             });
-            this.add.existing(image);
         }
+
+        this.add.existing(image);
 
     }
 

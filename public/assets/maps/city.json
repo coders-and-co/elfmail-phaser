@@ -341,6 +341,7 @@
                  "objectgroup":
                     {
                      "draworder":"index",
+                     "id":2,
                      "name":"",
                      "objects":[
                             {
@@ -366,7 +367,7 @@
                              "y":0
                             }, 
                             {
-                             "height":15.1515151515152,
+                             "height":0,
                              "id":8,
                              "name":"",
                              "rotation":0,

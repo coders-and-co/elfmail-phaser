@@ -193,7 +193,7 @@ export default class ElfMail extends Phaser.Scene {
                     this.windowLocations.push({x: t.x + 100, y: t.y + 100});
                     break;
                 case 'bird':
-                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1);
+                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1, t.name == 'right');
                     this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
 
                     break;

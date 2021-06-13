@@ -113,7 +113,18 @@ export default class ElfMail extends Phaser.Scene {
 
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.cursors.space.on('down',function(){refStart.destroy()});
+        var scene = this;
+        this.cursors.space.on('down',function() {
+            scene.add.tween({
+                targets: [refStart],
+                alpha: 0,
+                duration: 1000,
+                ease: 'Power2',
+                onComplete: () => {
+                    refStart.destroy();
+                }
+            });
+        })
 
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
@@ -358,10 +369,18 @@ export default class ElfMail extends Phaser.Scene {
             scene.ui.updateScore(scene.score);
             scene.misty.exclaim('misty_deliver', 1000);
             scene.playSound('deliver')
-            var ref = scene.add.text(delivery.receiver.x, delivery.receiver.y, delivery.message, { fontFamily: 'Courier', fontSize: '30px'});
-            var timer = scene.misty.scene.time.delayedCall(5000, function(){
-                ref.destroy();
-            }, undefined, this);
+            var ref = scene.add.text(delivery.receiver.x, delivery.receiver.y - 145, delivery.message, { fontFamily: 'Courier', fontSize: '30px', align: 'center', wordWrap: { width: 450, useAdvancedWrap: true }}).setOrigin(0.5);
+
+            scene.add.tween({
+                targets: [ref],
+                alpha: 0,
+                duration: 1000,
+                delay: 3000,
+                ease: 'Power2',
+                onComplete: () => {
+                    ref.destroy();
+                }
+            });
 
             delivery.receiver.destroy();
             scene.ui.removeIndicator(delivery);
@@ -375,7 +394,11 @@ export default class ElfMail extends Phaser.Scene {
                 scene.deliveries.splice(scene.deliveries.indexOf(delivery),1);
             } else {
                  console.log('TUTORIAL COMPLETE');
-                 var timer = scene.time.delayedCall(5000, function(){
+                var timerA = scene.time.delayedCall(2000, function() {
+                    scene.cameras.main.fadeOut(2500, 0, 0, 0);
+                }, undefined, this);
+                var timer = scene.time.delayedCall(3000, function() {
+                    scene.cameras.main.fadeIn(3000, 0, 0, 0);
                     scene.tutorial = false;
                     scene.themeMusic.stop();
                     scene.loadCity();

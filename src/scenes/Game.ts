@@ -274,7 +274,7 @@ export default class Demo extends Phaser.Scene {
     update(time: number, delta: number) {
 
         this.misty.update(time, delta);
-        console.log(this.cameras.main)
+        // console.log(this.cameras.main)
         this.scoreText.x = this.cameras.main.midPoint.x + 800;
         this.scoreText.y = this.cameras.main.midPoint.y - 500;
 

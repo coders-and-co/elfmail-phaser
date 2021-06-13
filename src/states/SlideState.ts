@@ -1,26 +1,62 @@
 import BaseState, { StateReturn } from './BaseState'
-import IdleState from './IdleState';
-import {Direction} from "./RunState";
-import JumpState from "./JumpState";
+import FallState from './FallState';
+import JumpState from './JumpState';
 
-export default class FallState extends BaseState {
+export default class SlideState extends BaseState {
 
     name = 'slide';
-    // graceFrames = 0;
-    //  graceFrames: number
+
+    wire!: Phaser.GameObjects.Line|null;
 
     enter(params: {}) {
+        this.wire = this.sprite.touchingWire;
+
         this.sprite.anims.play('misty_slide', true);
         this.sprite.body.allowGravity = false;
         this.sprite.body.stop();
-        // this.graceFrames = params.graceFrames;
     }
 
     exit() {
         this.sprite.body.allowGravity = true;
+        this.sprite.touchingWire = null;
     }
 
     update(): StateReturn|void {
+
+        if (this.sprite.jumpJustPressed) {
+            return { type: JumpState }
+        } else if (this.wire) {
+            let wireGeom = this.wire.geom as Phaser.Geom.Line;
+
+            let x1 = this.wire.x + wireGeom.x1;
+            let x2 = this.wire.x + wireGeom.x2;
+            let y1 = this.wire.y + wireGeom.y1;
+            let y2 = this.wire.y + wireGeom.y2;
+
+            let slope = y2 - y1 / this.wire.width;
+            let factor = (this.sprite.body.x - this.wire.x) / (this.wire.width);
+
+            if (factor < -0.05 || factor > 1.05) {
+                return { type: FallState }
+            }
+
+            // // interpolate
+            let y = y1 + ((y2-y1) * factor);
+            this.sprite.setY(y - this.sprite.height/2 - 10);
+
+            let target = null;
+            if (y1 > y2) {
+                target = new Phaser.Math.Vector2(x2, y2);
+            } else {
+                target = new Phaser.Math.Vector2(x1, y1);
+            }
+
+            let a = this.sprite.body.position.clone().subtract(target).normalize();
+            this.sprite.body.setVelocityX(a.x * 1000);
+
+        }
+
+
 
 
 

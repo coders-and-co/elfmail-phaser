@@ -32,7 +32,7 @@ export default class Peep extends Phaser.GameObjects.Sprite {
         this.anims.create({
             key: 'peep_animation',
             frames: this.anims.generateFrameNumbers('all_peeps', { start: peepNumber*2, end: ((peepNumber * 2) + 1) }),
-            frameRate: 1,
+            frameRate: 3,
             repeat: -1
         });
         this.anims.play('peep_animation', true);

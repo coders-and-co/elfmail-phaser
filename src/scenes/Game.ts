@@ -108,7 +108,7 @@ export default class ElfMail extends Phaser.Scene {
     }
 
     create() {
-        var refStart = this.add.sprite(1000,2150,'splash_art',0).setDepth(5000).setScale(1.2,1.2);
+        var refStart = this.add.sprite(1000,2550,'splash_art',0).setDepth(5000).setScale(1.2,1.2);
         this.messages = (this.cache.text.get('messages') as string).split('\n');
 
         // Keyboard Controls

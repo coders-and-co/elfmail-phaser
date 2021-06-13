@@ -319,9 +319,6 @@ export default class ElfMail extends Phaser.Scene {
 
         const obj2Tile = (obj2 as unknown) as Phaser.Tilemaps.Tile;
 
-
-
-
         // !this.fallThru, // misty isn't falling thru\
         // we're observing a platform tile
         if ([9, 10, 11].includes(obj2Tile.index)) {
@@ -329,13 +326,13 @@ export default class ElfMail extends Phaser.Scene {
             // jumping or falling thru
             if (obj1.body.velocity.y < 0 || this.fallThru) {
                 return false;
-            } else if (obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop()) {
+            } else if (obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop() + 1 && Math.abs(this.body.velocity.y) < 200) {
+                // && this.body.velocity.y < 20 // && obj1.body.bottom >= obj2Tile.getTop() // obj2Tile.faceTop
+                // console.log(this.body.velocity.y);
                 return false;
             }
             return true;
-
         }
-
         return true;
     }
 

@@ -15,7 +15,8 @@ export default class JumpState extends BaseState {
             this.isDouble = true;
         }
         if (this.isDouble) {
-            this.sprite.anims.play('misty_jump', true);
+            console.log('double jump');
+            this.sprite.anims.play('misty_double_jump', true);
             this.sprite.body.setVelocityY(-this.sprite.jumpPower);
             this.sprite.hasDoubleJump = false;
         } else {

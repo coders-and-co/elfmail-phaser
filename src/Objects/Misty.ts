@@ -13,7 +13,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     jumpJustPressed = false;
     hasDoubleJump = false;
 
-    graceFrames = 8;
+    graceFrames = 10;
 
 
 
@@ -65,6 +65,13 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         this.anims.create({
             key: 'misty_fall',
             frames: this.anims.generateFrameNumbers('misty_fall', { start: 0, end: 2 }),
+            frameRate: 15,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'misty_double_jump',
+            frames: this.anims.generateFrameNumbers('misty_double_jump', { start: 0, end: 3 }),
             frameRate: 15,
             repeat: -1
         });

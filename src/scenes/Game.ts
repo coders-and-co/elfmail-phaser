@@ -307,13 +307,24 @@ export default class ElfMail extends Phaser.Scene {
     physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
 
         const obj2Tile = (obj2 as unknown) as Phaser.Tilemaps.Tile;
-        if (this == obj1 && [9, 10, 11].includes(obj2Tile.index)) {
-            if(this.fallThru) {
+
+
+
+
+        // !this.fallThru, // misty isn't falling thru\
+        // we're observing a platform tile
+        if ([9, 10, 11].includes(obj2Tile.index)) {
+
+            // jumping or falling thru
+            if (obj1.body.velocity.y < 0 || this.fallThru) {
                 return false;
-            } else if(obj1.body.velocity.y <= 0 && obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop()) {
+            } else if (obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop()) {
                 return false;
             }
+            return true;
+
         }
+
         return true;
     }
 

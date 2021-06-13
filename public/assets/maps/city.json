@@ -1233,30 +1233,9 @@
                  "objectgroup":
                     {
                      "draworder":"index",
+                     "id":3,
                      "name":"",
                      "objects":[
-                            {
-                             "height":15,
-                             "id":5,
-                             "name":"",
-                             "rotation":0,
-                             "type":"",
-                             "visible":true,
-                             "width":100,
-                             "x":0,
-                             "y":0
-                            }, 
-                            {
-                             "height":15,
-                             "id":7,
-                             "name":"",
-                             "rotation":0,
-                             "type":"",
-                             "visible":true,
-                             "width":100,
-                             "x":0,
-                             "y":0
-                            }, 
                             {
                              "height":0,
                              "id":8,

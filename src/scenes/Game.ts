@@ -20,6 +20,8 @@ export default class ElfMail extends Phaser.Scene {
     themeMusic: any;
     score: number = 0;
 
+    tutorial = true;
+
     messages: string[] = [];
     usedMessages: string[] = [];
 
@@ -29,6 +31,7 @@ export default class ElfMail extends Phaser.Scene {
 
     preload() {
         // map
+        this.load.tilemapTiledJSON('tutorial_tilemap', 'assets/maps/tutorial.json');
         this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/city.json');
 
         this.load.text('messages', 'assets/letter/messages.txt');
@@ -56,6 +59,7 @@ export default class ElfMail extends Phaser.Scene {
 
         //this.load.text('messages', 'assets/letter/Messages_for_Misty');
         this.load.audio('theme', 'assets/sound/elfmail_theme.mp3');
+        this.load.audio('theme-tutorial', 'assets/sound/elfmail_tutorial_song.mp3');
         this.load.audio('collect', 'assets/sound/elfmail_collect.mp3');
         this.load.audio('deliver', 'assets/sound/elfmail_deliver.mp3');
         this.load.audio('jump', 'assets/sound/elfmail_jump.mp3');
@@ -63,11 +67,15 @@ export default class ElfMail extends Phaser.Scene {
         this.load.audio('landing', 'assets/sound/elfmail_landing.mp3', { volume: 0.00001 });
     }
 
-    addNewDelivery() {
+    addNewDelivery(indexSender?: number, indexReceiver?: number) {
 
-        const  indexSender = Math.floor(Math.random() * this.windowLocations.length);
+        if (typeof indexSender == 'undefined')
+            indexSender = Math.floor(Math.random() * this.windowLocations.length);
         const pointSender = this.windowLocations.splice(indexSender, 1)[0];
-        const indexReceiver = Math.floor(Math.random() * this.windowLocations.length);
+
+        // if (!indexReceiver)
+        if (typeof indexReceiver == 'undefined')
+             indexReceiver = Math.floor(Math.random() * this.windowLocations.length);
         const pointReceiver = this.windowLocations.splice(indexReceiver, 1)[0];
 
         const peep1 = Math.floor(Math.random() * 4);
@@ -116,13 +124,30 @@ export default class ElfMail extends Phaser.Scene {
 
         this.ui.misty = this.misty;
 
-        this.themeMusic = this.sound.add('theme');
+        if(this.tutorial) {
+            this.themeMusic = this.sound.add('theme-tutorial');
+        } else {
+            this.themeMusic = this.sound.add('theme');
+        }
+
         this.themeMusic.play({
             loop: true
         });
 
+        this.loadCity();
+
+    }
+
+    loadCity() {
+
         // Load Tilemap
-        const city = this.make.tilemap({ key: 'city_tilemap' });
+        let city;
+        if (this.tutorial) {
+            city = this.make.tilemap({ key: 'tutorial_tilemap' });
+        } else {
+            city = this.make.tilemap({ key: 'city_tilemap' });
+        }
+
 
         // add the tileset image we are using
         // const test_tileset = city.addTilesetImage('tiles_sheet', 'test_tiles');
@@ -189,13 +214,7 @@ export default class ElfMail extends Phaser.Scene {
         const triggers = city.getObjectLayer('Spawn Triggers');
         if (triggers) {
             for (const t of triggers.objects) {
-
-                console.log(t);
-
-                if (!t.x || !t.y) {
-                    continue;
-                }
-
+                if (!t.x || !t.y) continue;
                 switch (t.type) {
 
                 case 'player':
@@ -207,18 +226,21 @@ export default class ElfMail extends Phaser.Scene {
                 case 'bird':
                     var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1, t.name == 'right');
                     this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
-
-                        break;
+                    break;
                 }
 
             }
         }
 
-        console.log(this.windowLocations);
+        // console.log(this.windowLocations.length);
 
         // spawn letters
-        for (let x of Array(3)) {
-            this.addNewDelivery();
+        if (this.tutorial) {
+            this.addNewDelivery(0);
+        } else {
+            for (let x of Array(3)) {
+                this.addNewDelivery();
+            }
         }
 
         tileLayers[0].setDepth(-1);

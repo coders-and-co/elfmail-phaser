@@ -7,6 +7,8 @@ export default class SlideState extends BaseState {
     name = 'slide';
 
     wire!: Phaser.GameObjects.Line|null;
+    // emitter!: Phaser.GameObjects.Particles.ParticleEmitter|null;
+    // particles!: Phaser.GameObjects.Particles.ParticleEmitterManager;
 
     enter(params: {}) {
         this.wire = this.sprite.touchingWire;
@@ -14,17 +16,27 @@ export default class SlideState extends BaseState {
         this.sprite.anims.play('misty_slide', true);
         this.sprite.body.allowGravity = false;
         this.sprite.body.stop();
+        // emit sparks
+        this.sprite.particles.sparks.emitters.first.start();
+
     }
 
     exit() {
         this.sprite.body.allowGravity = true;
         this.sprite.touchingWire = null;
+        // stop emitting sparks
+        this.sprite.particles.sparks.emitters.first.stop();
     }
 
     update(): StateReturn|void {
 
         if (this.sprite.jumpJustPressed) {
-            return { type: JumpState }
+            if (this.cursors.down.isDown) {
+                this.sprite.body.setVelocityY(500);
+                return { type: FallState, params: { fallThru: true }};
+            } else {
+                return { type: JumpState };
+            }
         } else if (this.wire) {
             let wireGeom = this.wire.geom as Phaser.Geom.Line;
 

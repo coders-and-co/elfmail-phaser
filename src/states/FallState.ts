@@ -53,6 +53,7 @@ export default class FallState extends BaseState {
             return { type: SlideState }
         } else if (!this.sprite.fallThru && this.sprite.body.onFloor()) {
             this.playSound('landing', 0.5)
+            // this.sprite.particles.poofs.emitParticle();
             return { type: IdleState };
         } else {
             if (this.cursors.left.isDown) {

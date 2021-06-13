@@ -39,6 +39,7 @@ export default class ElfMail extends Phaser.Scene {
         // images
         this.load.image('sky','assets/sky_gradient.png');
         this.load.image('city_tiles', 'assets/Tileset/tileset_city.png');
+
         this.load.spritesheet('misty_run', 'assets/misty_animations/run_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_idle', 'assets/misty_animations/idle_animation_blink.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_fall', 'assets/misty_animations/fall_animation.png', {frameWidth: 100, frameHeight: 150});
@@ -52,6 +53,11 @@ export default class ElfMail extends Phaser.Scene {
         this.load.spritesheet('letter_get', 'assets/letter/letter_get.png', {frameWidth: 100, frameHeight: 100});
         this.load.image('letter', 'assets/letter/letter.png');
         this.load.image('splash_art', 'assets/splash_art.png');
+
+        this.load.spritesheet('sparks', 'assets/particles/spark_samples.png', {frameWidth: 9, frameHeight: 9});
+        this.load.spritesheet('stars', 'assets/particles/star_samples.png', {frameWidth: 14, frameHeight: 14});
+        this.load.spritesheet('sparkles', 'assets/particles/sparkle_samples.png', {frameWidth: 9, frameHeight: 12});
+        this.load.spritesheet('poofs', 'assets/particles/poof_samples.png', {frameWidth: 11, frameHeight: 8});
 
         this.load.spritesheet('bird_resting', 'assets/misc_animations/bird_idle.png', {frameWidth: 100, frameHeight: 100});
         this.load.spritesheet('bird_flying', 'assets/misc_animations/bird_flying.png', {frameWidth: 100, frameHeight: 100});
@@ -136,6 +142,7 @@ export default class ElfMail extends Phaser.Scene {
 
         this.ui.misty = this.misty;
 
+        // this.add.particles('particles')
 
         this.loadCity();
 
@@ -282,6 +289,10 @@ export default class ElfMail extends Phaser.Scene {
 
     physicsProcessWire(misty: Phaser.Types.Physics.Arcade.GameObjectWithBody, wire: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
 
+        if ((misty as Misty).fallThru) {
+            return false;
+        }
+
         let wireGeom = (wire as Phaser.GameObjects.Line).geom as Phaser.Geom.Line;
         let wireLine = new Phaser.Geom.Line(
             wire.body.x + wireGeom.x1,
@@ -372,6 +383,9 @@ export default class ElfMail extends Phaser.Scene {
             scene.ui.updateScore(scene.score);
             scene.misty.exclaim('misty_deliver', 1000);
             scene.playSound('deliver')
+            scene.misty.particles.stars.emitters.getByName('deliver')!.emitParticle();
+            // delivery.receiver.x, delivery.receiver.y
+
             var ref = scene.add.text(delivery.receiver.x, delivery.receiver.y - 145, delivery.message, { fontFamily: 'Courier', fontSize: '30px', align: 'center', wordWrap: { width: 450, useAdvancedWrap: true }}).setOrigin(0.5);
 
             scene.add.tween({

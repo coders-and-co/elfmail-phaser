@@ -3,6 +3,7 @@ import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
 import Peep from "../Objects/Peep";
 import UI from './UI';
+import Bird from "../Objects/Bird";
 
 import { Delivery, Point, DeliveryState } from '../types';
 
@@ -42,6 +43,8 @@ export default class ElfMail extends Phaser.Scene {
         this.load.spritesheet('misty_deliver', 'assets/misty_animations/deliver_animation.png', {frameWidth: 100, frameHeight: 150});
 
         this.load.spritesheet('letter_animation', 'assets/letter/letter_animation.png', {frameWidth: 100, frameHeight: 100});
+        this.load.spritesheet('bird_resting', 'assets/misc_animations/bird_idle.png', {frameWidth: 100, frameHeight: 100});
+
         this.load.spritesheet('letter_get', 'assets/letter/letter_get.png', {frameWidth: 100, frameHeight: 100});
 
 
@@ -196,7 +199,8 @@ export default class ElfMail extends Phaser.Scene {
                     this.windowLocations.push({x: t.x + 100, y: t.y + 100});
                     break;
                 case 'bird':
-                    this.add.circle(t.x, t.y, 15, 0xFF0000);
+                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1)
+                    this.add.existing(newBird);
                     break;
             }
 
@@ -314,6 +318,7 @@ export default class ElfMail extends Phaser.Scene {
             this[0].windowLocations.push({x: this[1].receiver.x, y: this[1].receiver.y})
             this[1].receiver.destroy();
             this[0].deliveries.splice(this[0].deliveries.indexOf(this[1]),1);
+            this[0].ui.removeIndicator(this[1]);
         }
     }
 

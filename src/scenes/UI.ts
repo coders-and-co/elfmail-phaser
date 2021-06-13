@@ -16,8 +16,8 @@ export default class ElfMailUI extends Phaser.Scene {
     indicators: Indicator[] = [];
 
     preload() {
-        this.load.image('i1', 'assets/indicator_1.png');
-        this.load.image('i2', 'assets/indicator_2.png');
+        this.load.image('i1', 'assets/indicator_1_small.png');
+        this.load.image('i2', 'assets/indicator_2_small.png');
     }
 
     create() {
@@ -65,10 +65,11 @@ export default class ElfMailUI extends Phaser.Scene {
         }
 
         if (existingIndicator) {
-            console.log('Existing!')
+            // console.log('Existing!')
             existingIndicator.image.setTexture(texture);
         } else {
             const image = new Phaser.GameObjects.Image(this, 0, 0, texture);
+            image.setDepth(98);
             this.indicators.push({
                 image,
                 delivery
@@ -78,7 +79,13 @@ export default class ElfMailUI extends Phaser.Scene {
 
     }
 
-    removeIndicator() {
+    removeIndicator(delivery: Delivery) {
+        let existingIndicator = this.indicators.find((x) => x.delivery == delivery);
+        if (existingIndicator) {
+            existingIndicator.image.destroy();
+            this.indicators.splice(this.indicators.indexOf(existingIndicator), 1);
+        }
+
 
     }
 

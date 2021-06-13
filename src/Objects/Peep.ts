@@ -1,6 +1,4 @@
 import Phaser, { Scene } from 'phaser';
-import BaseState from '../states/BaseState';
-import IdleState from '../states/IdleState';
 
 export default class Peep extends Phaser.GameObjects.Sprite {
 
@@ -17,24 +15,18 @@ export default class Peep extends Phaser.GameObjects.Sprite {
 
         super(scene, x, y, texture, frame); // The frame is optional
 
-        // this.setOrigin(0, 0);
-
         this.world = world;
         this.id = id;
         this.sender = sender;
         // add letter to the scene
-        //if (sender) {
-            scene.add.existing(this); // add letter to this scene
-        //}
+        scene.add.existing(this); // add letter to this scene
 
         // add letter to the Physics world
         this.body = new Phaser.Physics.Arcade.StaticBody(world, this);
         world.add(this.body);
 
-        // set letter''s collision properties
-        // this.body.setCollideWorldBounds(true);
+        // set letter's collision properties
         this.body.setSize(200, 200);
-        // this.body.setOffset(5,15);
         this.setDepth(0);
 
         this.anims.create({

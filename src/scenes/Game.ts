@@ -21,7 +21,8 @@ export default class ElfMail extends Phaser.Scene {
     letterMessages: any;
     themeMusic: any;
     score: number = 0;
-
+    messages: string[] = [];
+    usedMessages: string[] = [];
 
     constructor() {
         super('GameScene');
@@ -30,6 +31,9 @@ export default class ElfMail extends Phaser.Scene {
     preload() {
         // map
         this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/city.json');
+
+        this.load.text('messages', 'assets/letter/messages.txt');
+
         // images
         this.load.image('sky','assets/sky_gradient.png');
         this.load.image('city_tiles', 'assets/Tileset/tileset_city.png');
@@ -62,21 +66,32 @@ export default class ElfMail extends Phaser.Scene {
 
     addNewDelivery() {
 
-       const  indexSender = Math.floor(Math.random() * this.windowLocations.length);
+        const  indexSender = Math.floor(Math.random() * this.windowLocations.length);
         const pointSender = this.windowLocations.splice(indexSender, 1)[0];
         const indexReceiver = Math.floor(Math.random() * this.windowLocations.length);
         const pointReceiver = this.windowLocations.splice(indexReceiver, 1)[0];
 
         const peep1 = Math.floor(Math.random() * 4);
         const peep2 = Math.floor(Math.random() * 4);
-        console.log(peep1, peep2)
-        console.log(peep1*2, peep2*2)
+        // console.log(peep1, peep2)
+        // console.log(peep1*2, peep2*2)
+
+
+        if (this.messages.length == 0) {
+            this.messages = [...this.usedMessages];
+            this.usedMessages = [];
+        }
+
+        const msgIndex = Math.floor(Math.random() * this.messages.length);
+        const msg = this.messages.splice(msgIndex, 1)[0];
+
+        this.usedMessages.push(msg);
 
         const delivery = {
             sender: new Peep(this, this.physics.world, pointSender.x, pointSender.y, 'all_peeps', 1, true, peep1, peep1*2 ),
             receiver: new Peep(this, this.physics.world, pointReceiver.x, pointReceiver.y, 'all_peeps', 1, false, peep2, peep2*2 ),
             letter: new Letter(this, this.physics.world, pointSender.x, pointSender.y - 100, 'letter', 1, LetterTypes.love),
-            message: 'watermelons on sale',
+            message: msg,
             state: DeliveryState.Waiting,
         }
 
@@ -89,6 +104,9 @@ export default class ElfMail extends Phaser.Scene {
     }
 
     create() {
+
+        this.messages = (this.cache.text.get('messages') as string).split('\n');
+        // console.log(messages);
 
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -135,8 +153,8 @@ export default class ElfMail extends Phaser.Scene {
         //     map.createLayer('BG Parallax 2', tileset),
         //     map.createLayer('BG Parallax 3', tileset),
         // ]
-        console.log('Image Layers:');
-        console.log(city.images);
+        // console.log('Image Layers:');
+        // console.log(city.images);
 
         const tileLayers = [
             city.createLayer('Background Tiles', base_tileset),
@@ -147,7 +165,7 @@ export default class ElfMail extends Phaser.Scene {
         // process wires
         const wires = city.getObjectLayer('Wires');
         for (const w of wires.objects) {
-            console.log(w);
+            // console.log(w);
             if (w.type == 'wire' && w.polyline && w.x && w.y) {
                 const points: {x: number, y: number}[] = [];
                 let ox = city.widthInPixels;

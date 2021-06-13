@@ -262,9 +262,10 @@ export default class Demo extends Phaser.Scene {
     physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
 
         const obj2Tile = (obj2 as unknown) as Phaser.Tilemaps.Tile;
-
         if (this == obj1 && [9, 10, 11].includes(obj2Tile.index)) {
-            if(obj1.body.velocity.y <= 0 && obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop()) {
+            if(this.fallThru) {
+                return false;
+            } else if(obj1.body.velocity.y <= 0 && obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop()) {
                 return false;
             }
         }

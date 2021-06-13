@@ -7,6 +7,7 @@ export default class JumpState extends BaseState {
     name = 'jump';
 
     isDouble: boolean = false;
+    jumpTimer: number = 0;
 
     enter(params: { isDouble: boolean }) {
 
@@ -26,11 +27,13 @@ export default class JumpState extends BaseState {
 
     update(): StateReturn|void {
 
-        if (!this.isDouble && this.sprite.jumpJustPressed) {
+        this.jumpTimer++;
+
+        if (!this.isDouble && this.sprite.jumpJustPressed && this.jumpTimer > 3) {
             return { type: JumpState, params: { isDouble: true }};
         } else if (this.sprite.body.velocity.y > 0) {
             return { type: FallState };
-        } else if (this.sprite.body.onFloor()) {
+        } else if (this.sprite.body.onFloor() && this.jumpTimer > 3) {
             // Keep this state in case you jump directly to a platform and never attain + velocity
             return { type: IdleState };
         } else {

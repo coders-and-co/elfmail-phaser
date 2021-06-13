@@ -1,32 +1,17 @@
 import Phaser, { Physics } from 'phaser';
 import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
-// import City from "../city";
 import Peep from "../Objects/Peep";
-import enable = Phaser.Display.Canvas.Smoothing.enable;
+import UI from './UI';
+
+import { Delivery, Point, DeliveryState } from '../types';
 
 
-enum DeliveryState {
-    Waiting,
-    PickedUp,
-    Delivered,
-}
 
-export interface Delivery {
-    sender: Peep,
-    receiver: Peep,
-    letter: Letter,
-    message: string,
-    state: DeliveryState,
-}
 
-export interface Point {
-    x: number;
-    y: number;
-}
+export default class ElfMail extends Phaser.Scene {
 
-export default class Demo extends Phaser.Scene {
-
+    ui!: UI;
     misty!: Misty;
     letter!: Letter;
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -35,19 +20,17 @@ export default class Demo extends Phaser.Scene {
     letterMessages: any;
     themeMusic: any;
     score: number = 0;
-    scoreText!: any;
+
 
     constructor() {
         super('GameScene');
     }
 
     preload() {
-        // this.load.scenePlugin('Slopes', Slopes);
         // map
         this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/city.json');
         // images
         this.load.image('sky','assets/sky_gradient.png');
-        // this.load.image('test_tiles', 'assets/tiles_sheet.png');
         this.load.image('city_tiles', 'assets/Tileset/tileset_city.png');
         this.load.spritesheet('misty_run', 'assets/misty_animations/run_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_idle', 'assets/misty_animations/idle_animation_blink.png', {frameWidth: 100, frameHeight: 150});
@@ -97,9 +80,15 @@ export default class Demo extends Phaser.Scene {
 
         this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, [this, delivery]);
         this.physics.add.overlap(delivery.receiver, this.misty, this.deliver, undefined, [this, delivery]);
+
+        this.ui.addIndicator(delivery);
     }
 
     create() {
+
+
+
+
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
         // this.letterMessages = fetch('Messages_for_Misty.txt')
@@ -111,12 +100,20 @@ export default class Demo extends Phaser.Scene {
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
         this.misty = new Misty(this, this.physics.world, this.cursors, 200, 9500, 'misty_idle');
+
+        this.ui = this.scene.add('ui', new UI({
+            active: true,
+        }), true) as UI;
+
+        this.ui.misty = this.misty;
+
+
         this.themeMusic = this.sound.add('theme');
         this.themeMusic.play({
             loop: true
         });
 
-        this.scoreText = this.add.text(this.cameras.main.midPoint.x + 450, this.cameras.main.midPoint.y - 500, 'Letters e(lf)-mailed: ' + this.score, { fontFamily: 'Courier', fontSize: '30px', }).setScrollFactor(0);
+
 
         // Load Tilemap
         const city = this.make.tilemap({ key: 'city_tilemap' });
@@ -283,7 +280,7 @@ export default class Demo extends Phaser.Scene {
 
     update(time: number, delta: number) {
         this.misty.update(time, delta);
-        this.scoreText.setText('Letters e(lf)-mailed: ' + this.score);
+        // this.ui.updateScore(this.score);
     }
 
     collected(this: [this, Delivery]){
@@ -293,14 +290,21 @@ export default class Demo extends Phaser.Scene {
         this[1].letter.body.enable = false;
         this[1].letter.anims.play('letter_get', true);
         var timer = this[0].time.delayedCall(800, this[0].destroyLetter, [this[1]]);
+        this[1].state = DeliveryState.PickedUp;
+        this[0].ui.addIndicator(this[1]);
     }
+
+
     destroyLetter(){
         arguments[0].letter.destroy()
     }
 
     deliver(this: [this, Delivery]) {
         if(!this[1].sender.body){
+
             this[0].score = this[0].score + 1;
+            this[0].ui.updateScore(this[0].score)
+
             this[0].misty.exclaim('misty_deliver', 1000);
             this[0].playSound('deliver')
             this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});

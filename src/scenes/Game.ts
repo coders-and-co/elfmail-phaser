@@ -3,6 +3,7 @@ import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
 // import City from "../city";
 import Peep from "../Objects/Peep";
+import enable = Phaser.Display.Canvas.Smoothing.enable;
 
 
 enum DeliveryState {
@@ -279,7 +280,7 @@ export default class Demo extends Phaser.Scene {
         this[0].misty.exclaim('misty_collect');
         this[0].playSound('collect')
         this[1].sender.destroy();
-        this[1].letter.disableInteractive();
+        this[1].letter.body.enable = false;
         this[1].letter.anims.play('letter_get', true);
         var timer = this[0].time.delayedCall(800, this[0].destroyLetter, [this[1]]);
     }

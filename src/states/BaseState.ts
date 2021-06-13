@@ -1,4 +1,4 @@
-import Phaser, { GameObjects } from 'phaser';
+import Phaser, { GameObjects, Scene } from 'phaser';
 import Misty from '../Objects/Misty';
 
 export interface StateReturn {
@@ -27,6 +27,14 @@ export default class BaseState {
 
     update(): StateReturn|void {
 
+    }
+
+    playSound(name: string, volume?: number){
+        var soundEffect = this.sprite.scene.sound.add(name);
+        soundEffect.play({
+            loop: false,
+            volume: volume? volume : 1
+        });
     }
 
 }

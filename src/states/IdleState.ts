@@ -7,7 +7,7 @@ export default class IdleState extends BaseState {
 
     name = 'idle';
 
-    enter(params: {}) {
+    enter() {
         this.sprite.body.setVelocityX(0);
         this.sprite.anims.play('misty_idle', true);
         this.sprite.hasDoubleJump = true;

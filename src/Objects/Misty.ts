@@ -17,8 +17,6 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     graceFrames = 10;
 
-
-
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
 
         super(scene, x, y, texture, frame); // The frame is optional
@@ -87,6 +85,12 @@ export default class Misty extends Phaser.GameObjects.Sprite {
             repeat: -1
         });
 
+        this.anims.create({
+            key: 'misty_collect',
+            frames: this.anims.generateFrameNumbers('misty_collect', { start: 0, end: 4 }),
+            duration: 400,
+        });
+
         // set initial MovementState
         // this.movementState = new IdleState(this, cursors);
         this.changeState({type: IdleState});
@@ -116,5 +120,15 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         }
         this.movementState = new nextState.type(this, this.cursors);
         this.movementState.enter(nextState.params || {});
+    }
+
+    exclaim() {
+        this.body.moves = false;
+        this.anims.play('misty_collect', true);
+        var timer = this.scene.time.delayedCall(350, this.move, [this]);
+    }
+
+    move() {
+        arguments[0].body.moves = true;
     }
 }

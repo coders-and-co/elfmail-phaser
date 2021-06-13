@@ -1,6 +1,7 @@
 import Phaser, { Physics } from 'phaser';
 import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
+// import City from "../city";
 import Peep from "../Objects/Peep";
 
 
@@ -30,6 +31,10 @@ export default class Demo extends Phaser.Scene {
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     deliveries: Delivery[] = [];
     windowLocations: Point[] = [];
+    letterMessages: any;
+    themeMusic: any;
+    score: number = 0;
+    scoreText!: any;
 
     constructor() {
         super('GameScene');
@@ -49,10 +54,18 @@ export default class Demo extends Phaser.Scene {
         this.load.spritesheet('misty_jump', 'assets/misty_animations/jump_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_double_jump', 'assets/misty_animations/double_jump_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_slide', 'assets/misty_animations/slide_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_collect', 'assets/misty_animations/collect_animation.png', {frameWidth: 100, frameHeight: 150});
 
-        this.load.image('letter', 'assets/letter.png');
+        this.load.image('letter', 'assets/letter/letter.png');
         this.load.spritesheet('computer_peep', 'assets/peeps/computer_peep.png', {frameWidth: 200, frameHeight: 200});
         this.load.spritesheet('phone_peep', 'assets/peeps/phone_peep.png', {frameWidth: 200, frameHeight: 200});
+        //this.load.text('messages', 'assets/letter/Messages_for_Misty');
+        this.load.audio('theme', 'assets/sound/elfmail_theme.mp3');
+        this.load.audio('collect', 'assets/sound/elfmail_collect.mp3');
+        this.load.audio('deliver', 'assets/sound/elfmail_deliver.mp3');
+        this.load.audio('jump', 'assets/sound/elfmail_jump.mp3');
+        this.load.audio('doublejump', 'assets/sound/elfmail_doublejump.mp3');
+        this.load.audio('landing', 'assets/sound/elfmail_landing.mp3', { volume: 0.00001 });
     }
 
     addNewDelivery() {
@@ -78,18 +91,28 @@ export default class Demo extends Phaser.Scene {
 
         console.log('delivery', delivery);
         console.log(this.deliveries.length);
-        this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, delivery);
+        this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, [this, delivery]);
         this.physics.add.overlap(delivery.receiver, this.misty, this.deliver, undefined, [this, delivery]);
     }
 
     create() {
-
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
+        // this.letterMessages = fetch('Messages_for_Misty.txt')
+        //     .then(response => {return [response.text()]})
+        //     .then(text => console.log(text))
+        // console.log(this.letterMessages);
+
 
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
         this.misty = new Misty(this, this.physics.world, this.cursors, 200, 9500, 'misty_idle');
+        this.themeMusic = this.sound.add('theme');
+        this.themeMusic.play({
+            loop: true
+        });
+        console.log(this.cameras.main.x, this.cameras.main.y)
+        this.scoreText = this.add.text(this.cameras.main.midPoint.x + 800, this.cameras.main.midPoint.y - 500, 'score', { fontFamily: 'Courier', fontSize: '30px'});
 
 
 
@@ -251,20 +274,24 @@ export default class Demo extends Phaser.Scene {
     update(time: number, delta: number) {
 
         this.misty.update(time, delta);
+        console.log(this.cameras.main)
+        this.scoreText.x = this.cameras.main.midPoint.x + 800;
+        this.scoreText.y = this.cameras.main.midPoint.y - 500;
+
 
     }
 
-    collected(this: Delivery){
-        console.log('this in collected')
-        console.log(this.sender);
-        //this.sender.setTexture('computer_peep',1)
-        console.log(this.sender.texture);
-        this.sender.destroy();
-        this.letter.destroy();
+    collected(this: [this, Delivery]){
+        this[0].misty.exclaim();
+        this[0].playSound('collect')
+        this[1].sender.destroy();
+        this[1].letter.destroy();
     }
 
     deliver(this: [this, Delivery]) {
         if(!this[1].sender.body){
+            this[0].misty.exclaim();
+            this[0].playSound('deliver')
             this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
             // create new delivery to replaced completed one
             this[0].addNewDelivery();
@@ -275,5 +302,11 @@ export default class Demo extends Phaser.Scene {
         }
     }
 
+    playSound(name: string){
+        var soundEffect = this.sound.add(name);
+        soundEffect.play({
+            loop: false
+        });
+    }
 
 }

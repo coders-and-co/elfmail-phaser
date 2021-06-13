@@ -43,9 +43,9 @@ export default class RunState extends BaseState {
             // return { type: JumpState };
         } else if (!this.cursors.right.isDown && !this.cursors.left.isDown) {
             return { type: IdleState };
-        } else if (this.cursors.left.isDown && this.direction !== Direction.Left) {
+        } else if (this.cursors.left.isDown && !this.cursors.right.isDown && this.direction !== Direction.Left) {
             return {type: RunState, params: { direction: Direction.Left }};
-        } else if (this.cursors.right.isDown && this.direction !== Direction.Right) {
+        } else if (this.cursors.right.isDown && !this.cursors.left.isDown && this.direction !== Direction.Right) {
             return { type: RunState, params: { direction: Direction.Right }};
         }
     }

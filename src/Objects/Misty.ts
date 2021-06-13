@@ -12,6 +12,8 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     jumpPower = 1200;
     inJumpState = false;
 
+    graceFrames = 8;
+
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
 
         super(scene, x, y, texture, frame); // The frame is optional

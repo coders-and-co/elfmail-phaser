@@ -56,9 +56,13 @@ export default class Demo extends Phaser.Scene {
 
     addNewDelivery() {
 
-        const indexSender = Math.floor(Math.random() * this.windowLocations.length);
+       const  indexSender = Math.floor(Math.random() * this.windowLocations.length);
+        //const indexSender = 0;
+
         const pointSender = this.windowLocations.splice(indexSender, 1)[0];
         const indexReceiver = Math.floor(Math.random() * this.windowLocations.length);
+        //const indexReceiver = 12;
+
         const pointReceiver = this.windowLocations.splice(indexReceiver, 1)[0];
 
         const delivery = {
@@ -72,8 +76,9 @@ export default class Demo extends Phaser.Scene {
         this.deliveries.push(delivery);
 
         console.log('delivery', delivery);
+        console.log(this.deliveries.length);
         this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, delivery);
-
+        this.physics.add.overlap(delivery.receiver, this.misty, this.deliver, undefined, [this, delivery]);
     }
 
     create() {
@@ -191,9 +196,19 @@ export default class Demo extends Phaser.Scene {
         console.log(this.sender.texture);
         this.sender.destroy();
         this.letter.destroy();
-        //this.scene.add.existing(this.receiver);
-        // new peeps image
-
     }
+
+    deliver(this: [this, Delivery]) {
+        if(!this[1].sender.body){
+            this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
+            // create new delivery to replaced completed one
+            this[0].addNewDelivery();
+            // add window location back
+            this[0].windowLocations.push({x: this[1].receiver.x, y: this[1].receiver.y})
+            this[1].receiver.destroy();
+            this[0].deliveries.splice(this[0].deliveries.indexOf(this[1]),1);
+        }
+    }
+
 
 }

@@ -1,15 +1,23 @@
 import BaseState, { StateReturn } from './BaseState'
 import IdleState from './IdleState';
+import {Direction} from "./RunState";
+import JumpState from "./JumpState";
 
 export default class FallState extends BaseState {
 
     name = 'fall';
+    graceFrames = 0;
 
-    enter() {
+    enter(params: { graceFrames: number }) {
         this.sprite.anims.play('misty_fall', true);
+        this.graceFrames = params.graceFrames;
     }
 
     update(): StateReturn|void {
+        if (this.graceFrames > 0 && this.cursors.space.isDown) {
+            return { type: JumpState };
+        }
+        this.graceFrames = this.graceFrames - 1;
         if (this.sprite.body.onFloor()) {
             return { type: IdleState };
         } else {

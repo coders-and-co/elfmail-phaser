@@ -348,9 +348,17 @@ export default class ElfMail extends Phaser.Scene {
             scene.misty.exclaim('misty_deliver', 1000);
             scene.playSound('deliver')
             var ref = scene.add.text(delivery.receiver.x, delivery.receiver.y - 145, delivery.message, { fontFamily: 'Courier', fontSize: '30px', align: 'center', wordWrap: { width: 450, useAdvancedWrap: true }}).setOrigin(0.5);
-            var timer = scene.misty.scene.time.delayedCall(5000, function(){
-                ref.destroy();
-            }, undefined, this);
+
+            scene.add.tween({
+                targets: [ref],
+                alpha: 0,
+                duration: 1000,
+                delay: 3000,
+                ease: 'Power2',
+                onComplete: () => {
+                    ref.destroy();
+                }
+            });
 
             delivery.receiver.destroy();
             scene.ui.removeIndicator(delivery);

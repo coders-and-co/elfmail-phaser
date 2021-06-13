@@ -89,35 +89,35 @@
                          "y":0
                         }, 
                         {
-                         "x":1200,
-                         "y":-500
+                         "x":1175,
+                         "y":-475
                         }],
                  "rotation":0,
                  "type":"wire",
                  "visible":true,
                  "width":0,
-                 "x":5600,
+                 "x":5625,
                  "y":5500
                 }, 
                 {
                  "height":0,
-                 "id":33,
+                 "id":35,
                  "name":"",
                  "polyline":[
                         {
-                         "x":-100,
+                         "x":0,
                          "y":0
                         }, 
                         {
-                         "x":-400,
-                         "y":-300
+                         "x":275,
+                         "y":275
                         }],
                  "rotation":0,
                  "type":"wire",
                  "visible":true,
                  "width":0,
-                 "x":7200,
-                 "y":5300
+                 "x":6800,
+                 "y":5025
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -305,6 +305,18 @@
                  "width":200,
                  "x":8400,
                  "y":6300
+                }, 
+                {
+                 "height":0,
+                 "id":34,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"player",
+                 "visible":true,
+                 "width":0,
+                 "x":6800,
+                 "y":4900
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -313,7 +325,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":34,
+ "nextobjectid":36,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.7.0",

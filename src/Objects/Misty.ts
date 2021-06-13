@@ -13,6 +13,8 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     jumpJustPressed = false;
     hasDoubleJump = false;
 
+    touchingWire: Phaser.GameObjects.Line|null = null;
+
     graceFrames = 10;
 
 
@@ -30,9 +32,11 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         // set jump handler
         cursors.space.on('down', this.handleJump.bind(this));
 
+        // set rendering depth
+        this.setDepth(1);
+
         // add Misty to the Physics world
         this.body = new Phaser.Physics.Arcade.Body(world, this);
-        this.setDepth(1);
         world.add(this.body);
 
         // set Misty's collision properties
@@ -72,6 +76,13 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         this.anims.create({
             key: 'misty_double_jump',
             frames: this.anims.generateFrameNumbers('misty_double_jump', { start: 0, end: 3 }),
+            frameRate: 15,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'misty_slide',
+            frames: this.anims.generateFrameNumbers('misty_slide', { start: 0, end: 1 }),
             frameRate: 15,
             repeat: -1
         });

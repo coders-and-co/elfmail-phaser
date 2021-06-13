@@ -1,7 +1,6 @@
-import Phaser, { GameObjects } from 'phaser';
+import Phaser, { Physics } from 'phaser';
 import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
-// import City from "../city";
 import Peep from "../Objects/Peep";
 
 
@@ -37,6 +36,7 @@ export default class Demo extends Phaser.Scene {
     }
 
     preload() {
+        // this.load.scenePlugin('Slopes', Slopes);
         // map
         this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/city.json');
         // images
@@ -48,6 +48,7 @@ export default class Demo extends Phaser.Scene {
         this.load.spritesheet('misty_fall', 'assets/misty_animations/fall_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_jump', 'assets/misty_animations/jump_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_double_jump', 'assets/misty_animations/double_jump_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_slide', 'assets/misty_animations/slide_animation.png', {frameWidth: 100, frameHeight: 150});
 
         this.load.image('letter', 'assets/letter.png');
         this.load.spritesheet('computer_peep', 'assets/peeps/computer_peep.png', {frameWidth: 200, frameHeight: 200});
@@ -124,13 +125,48 @@ export default class Demo extends Phaser.Scene {
             city.createLayer('Overlay Tiles', base_tileset),
         ]
 
+        // process wires
+        const wires = city.getObjectLayer('Wires');
+        for (const w of wires.objects) {
+            console.log(w);
+            if (w.type == 'wire' && w.polyline && w.x && w.y) {
+                const points: {x: number, y: number}[] = [];
+                let ox = city.widthInPixels;
+                let oy = city.heightInPixels;
+                for (let p of w.polyline) {
+                    if (typeof p.x !== 'undefined' && typeof p.y !== 'undefined') {
+                        let point = {x: w.x + p.x, y: w.y + p.y};
+                        ox = Math.min(ox, point.x);
+                        oy = Math.min(oy, point.y);
+                        points.push(point);
+                    }
+                }
+                let tp = points.map((p) => ({x: p.x - ox, y: p.y - oy}));
+                let wire = this.add.line(ox, oy, tp[0].x, tp[0].y, tp[1].x, tp[1].y);
+                // polygon(ox, oy, translatedPoints);
+                wire.setOrigin(0, 0);
+                wire.setStrokeStyle(5, 0xFFFFFF);
+                wire.setLineWidth(5);
+
+                this.physics.add.existing(wire, true);
+                this.physics.add.collider(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
+                this.physics.add.overlap(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
+
+            }
+        }
+
+
         // process spawn triggers
         const triggers = city.getObjectLayer('Spawn Triggers');
+
         for (const t of triggers.objects) {
             if (t.rectangle && t.type == 'window') {
                 if (t.x && t.y) {
                     this.windowLocations.push({x: t.x + 100, y: t.y + 100});
                 }
+            }
+            if (t.point && t.type == 'player') {
+                this.misty.setPosition(t.x, t.y);
             }
         }
 
@@ -163,14 +199,49 @@ export default class Demo extends Phaser.Scene {
 
     }
 
+    physicsProcessWire(misty: Phaser.Types.Physics.Arcade.GameObjectWithBody, wire: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
+
+        let wireGeom = (wire as Phaser.GameObjects.Line).geom as Phaser.Geom.Line;
+        let wireLine = new Phaser.Geom.Line(
+            wire.body.x + wireGeom.x1,
+            wire.body.y + wireGeom.y1,
+            wire.body.x + wireGeom.x2,
+            wire.body.y + wireGeom.y2
+        );
+        let mistyRect = new Phaser.Geom.Rectangle(
+            misty.body.left, misty.body.top, misty.body.width, misty.body.height
+        )
+        const isColliding = Phaser.Geom.Intersects.LineToRectangle(wireLine, mistyRect);
+        if (isColliding) {
+            (misty as Misty).touchingWire = wire as Phaser.GameObjects.Line;
+        } else {
+            (misty as Misty).touchingWire = null;
+        }
+        return isColliding;
+    }
+
+    physicsCollideWire(misty: Phaser.Types.Physics.Arcade.GameObjectWithBody, wire: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
+        // let w = (wire as Phaser.GameObjects.Line)
+        // let wireGeom = w.geom as Phaser.Geom.Line;
+        // let y1 = wire.body.y + wireGeom.y1;
+        // let y2 = wire.body.y + wireGeom.y2;
+        // let factor = (misty.body.x - wire.body.x) / (wire.body.width);
+        // // interpolate
+        // let y = y1 + ((y2-y1) * factor);
+        // misty.body.stop();
+        // misty.body.y = y - misty.body.height;
+    }
+
     physicsCollisionPlatform(obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
 
     }
 
-    physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Tilemaps.Tile) {
+    physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
 
-        if (this == obj1 && [9, 10, 11].includes(obj2.index)) {
-            if(obj1.body.velocity.y <= 0 && obj2.faceTop && obj1.body.bottom > obj2.getTop()) {
+        const obj2Tile = (obj2 as unknown) as Phaser.Tilemaps.Tile;
+
+        if (this == obj1 && [9, 10, 11].includes(obj2Tile.index)) {
+            if(obj1.body.velocity.y <= 0 && obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop()) {
                 return false;
             }
         }

@@ -2,6 +2,7 @@ import BaseState, { StateReturn } from './BaseState'
 import IdleState from './IdleState';
 import {Direction} from "./RunState";
 import JumpState from "./JumpState";
+import SlideState from "./SlideState";
 
 export default class FallState extends BaseState {
 
@@ -29,7 +30,9 @@ export default class FallState extends BaseState {
             this.graceFrames = this.graceFrames - 1;
         }
 
-        if (this.sprite.body.onFloor()) {
+        if (this.sprite.touchingWire) {
+            return { type: SlideState }
+        } else if (this.sprite.body.onFloor()) {
             return { type: IdleState };
         } else {
             if (this.cursors.left.isDown) {

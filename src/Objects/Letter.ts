@@ -43,6 +43,23 @@ export default class Letter extends Phaser.GameObjects.Sprite {
         // this.body.setCollideWorldBounds(true);
         this.body.setSize(90,73);
         this.body.setOffset(5,15);
+
+        this.anims.create({
+            key: 'letter_animation',
+            frames: this.anims.generateFrameNumbers('letter_animation', { start: 0, end: 7 }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'letter_get',
+            frames: this.anims.generateFrameNumbers('letter_get', { start: 0, end: 5 }),
+            frameRate: 8,
+            repeat: 0
+        });
+        this.anims.play('letter_animation',true);
+
+
     }
 
     collected () {

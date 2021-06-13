@@ -12,6 +12,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     jumpPower = 1200;
     jumpJustPressed = false;
     hasDoubleJump = false;
+    fallThru = false;
 
     touchingWire: Phaser.GameObjects.Line|null = null;
 
@@ -91,6 +92,12 @@ export default class Misty extends Phaser.GameObjects.Sprite {
             duration: 400,
         });
 
+        this.anims.create({
+            key: 'misty_deliver',
+            frames: this.anims.generateFrameNumbers('misty_deliver', { start: 0, end: 7 }),
+            duration: 600,
+        });
+
         // set initial MovementState
         // this.movementState = new IdleState(this, cursors);
         this.changeState({type: IdleState});
@@ -122,10 +129,10 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         this.movementState.enter(nextState.params || {});
     }
 
-    exclaim() {
+    exclaim(type: string, delay?: number) {
         this.body.moves = false;
-        this.anims.play('misty_collect', true);
-        var timer = this.scene.time.delayedCall(350, this.move, [this]);
+        this.anims.play(type, true);
+        var timer = this.scene.time.delayedCall( delay? delay : 350, this.move, [this]);
     }
 
     move() {

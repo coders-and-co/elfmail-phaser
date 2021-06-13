@@ -53,36 +53,6 @@ export default class SlideState extends BaseState {
 
             let a = this.sprite.body.position.clone().subtract(target).normalize();
             this.sprite.body.setVelocityX(a.x * 1000);
-
         }
-
-
-
-
-
-
-        // if (this.sprite.jumpJustPressed) {
-        //     if (this.graceFrames > 0) {
-        //         return { type: JumpState };
-        //     } else if (this.sprite.hasDoubleJump) {
-        //         return { type: JumpState, params: { isDouble: true }};
-        //     }
-        // } else {
-        //     this.graceFrames = this.graceFrames - 1;
-        // }
-
-        // if (this.sprite.body.onFloor()) {
-        //     return { type: IdleState };
-        // } else {
-        //     if (this.cursors.left.isDown) {
-        //         this.sprite.setFlip(true, false);
-        //         this.sprite.body.setVelocityX(-this.sprite.runSpeed);
-        //     } else if (this.cursors.right.isDown) {
-        //         this.sprite.setFlip(false, false);
-        //         this.sprite.body.setVelocityX(this.sprite.runSpeed);
-        //     } else {
-        //         this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
-        //     }
-        // }
     }
 }

@@ -8,17 +8,36 @@ export default class FallState extends BaseState {
 
     name = 'fall';
     graceFrames = 0;
+    fallThruTimer = 0;
 
-    enter(params: { graceFrames: number }) {
+    enter(params: { graceFrames: number, fallThru: boolean }) {
         this.sprite.anims.play('misty_fall', true);
         this.graceFrames = params.graceFrames;
+        if (params.fallThru) {
+            this.sprite.fallThru = true;
+            this.fallThruTimer = 50;
+        } else {
+            this.sprite.fallThru = false;
+        }
     }
 
     exit() {
-
+        this.sprite.fallThru = false;
     }
 
     update(): StateReturn|void {
+
+        if (this.fallThruTimer > 0) {
+            this.fallThruTimer--;
+            if (this.fallThruTimer == 0) {
+                this.sprite.fallThru = false;
+            }
+        }
+
+        if (this.graceFrames > 0) {
+            this.graceFrames--;
+        }
+
 
         if (this.sprite.jumpJustPressed) {
             if (this.graceFrames > 0) {
@@ -26,13 +45,11 @@ export default class FallState extends BaseState {
             } else if (this.sprite.hasDoubleJump) {
                 return { type: JumpState, params: { isDouble: true }};
             }
-        } else {
-            this.graceFrames = this.graceFrames - 1;
         }
 
         if (this.sprite.touchingWire) {
             return { type: SlideState }
-        } else if (this.sprite.body.onFloor()) {
+        } else if (!this.sprite.fallThru && this.sprite.body.onFloor()) {
             this.playSound('landing', 0.5)
             return { type: IdleState };
         } else {

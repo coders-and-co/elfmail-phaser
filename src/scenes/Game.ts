@@ -124,6 +124,13 @@ export default class ElfMail extends Phaser.Scene {
 
         this.ui.misty = this.misty;
 
+
+        this.loadCity();
+
+    }
+
+    loadCity() {
+
         if(this.tutorial) {
             this.themeMusic = this.sound.add('theme-tutorial');
         } else {
@@ -134,11 +141,6 @@ export default class ElfMail extends Phaser.Scene {
             loop: true
         });
 
-        this.loadCity();
-
-    }
-
-    loadCity() {
 
         // Load Tilemap
         let city;
@@ -334,24 +336,39 @@ export default class ElfMail extends Phaser.Scene {
     }
 
     deliver(this: [this, Delivery]) {
-        if(!this[1].sender.body){
 
-            this[0].score = this[0].score + 1;
-            this[0].ui.updateScore(this[0].score);
-            this[0].misty.exclaim('misty_deliver', 1000);
-            this[0].playSound('deliver')
-            var ref = this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
-            var timer = this[0].misty.scene.time.delayedCall(5000, function(){
+        const scene = this[0];
+        const delivery = this[1];
+
+        if(!delivery.sender.body){
+
+            scene.score = scene.score + 1;
+            scene.ui.updateScore(scene.score);
+            scene.misty.exclaim('misty_deliver', 1000);
+            scene.playSound('deliver')
+            var ref = scene.add.text(delivery.receiver.x, delivery.receiver.y, delivery.message, { fontFamily: 'Courier', fontSize: '30px'});
+            var timer = scene.misty.scene.time.delayedCall(5000, function(){
                 ref.destroy();
             }, undefined, this);
 
-            // create new delivery to replaced completed one
-            this[0].addNewDelivery();
-            // add window location back
-            this[0].windowLocations.push({x: this[1].receiver.x, y: this[1].receiver.y})
-            this[1].receiver.destroy();
-            this[0].deliveries.splice(this[0].deliveries.indexOf(this[1]),1);
-            this[0].ui.removeIndicator(this[1]);
+            delivery.receiver.destroy();
+            scene.ui.removeIndicator(delivery);
+
+            if(!scene.tutorial) {
+                // create new delivery to replaced completed one
+                scene.addNewDelivery();
+
+                // add window location back
+                scene.windowLocations.push({x: delivery.receiver.x, y: delivery.receiver.y})
+                scene.deliveries.splice(scene.deliveries.indexOf(delivery),1);
+            } else {
+                 console.log('TUTORIAL COMPLETE');
+                 var timer = scene.time.delayedCall(5000, function(){
+                    scene.tutorial = false;
+                    scene.themeMusic.stop();
+                    scene.loadCity();
+                }, undefined, this);
+             }
         }
     }
 

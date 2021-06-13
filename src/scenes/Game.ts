@@ -364,7 +364,11 @@ export default class ElfMail extends Phaser.Scene {
                 scene.deliveries.splice(scene.deliveries.indexOf(delivery),1);
             } else {
                  console.log('TUTORIAL COMPLETE');
-                 var timer = scene.time.delayedCall(5000, function(){
+                var timerA = scene.time.delayedCall(2000, function() {
+                    scene.cameras.main.fadeOut(2500, 0, 0, 0);
+                }, undefined, this);
+                var timer = scene.time.delayedCall(3000, function() {
+                    scene.cameras.main.fadeIn(3000, 0, 0, 0);
                     scene.tutorial = false;
                     scene.themeMusic.stop();
                     scene.loadCity();

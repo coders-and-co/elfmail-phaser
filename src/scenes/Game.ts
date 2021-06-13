@@ -51,13 +51,13 @@ export default class ElfMail extends Phaser.Scene {
         this.load.spritesheet('letter_animation', 'assets/letter/letter_animation.png', {frameWidth: 100, frameHeight: 100});
         this.load.spritesheet('letter_get', 'assets/letter/letter_get.png', {frameWidth: 100, frameHeight: 100});
         this.load.image('letter', 'assets/letter/letter.png');
+        this.load.image('splash_art', 'assets/splash_art.png');
 
         this.load.spritesheet('bird_resting', 'assets/misc_animations/bird_idle.png', {frameWidth: 100, frameHeight: 100});
         this.load.spritesheet('bird_flying', 'assets/misc_animations/bird_flying.png', {frameWidth: 100, frameHeight: 100});
 
         this.load.spritesheet('all_peeps', 'assets/peeps/random_peep.png', {frameWidth: 200, frameHeight: 200});
 
-        //this.load.text('messages', 'assets/letter/Messages_for_Misty');
         this.load.audio('theme', 'assets/sound/elfmail_theme.mp3');
         this.load.audio('theme-tutorial', 'assets/sound/elfmail_tutorial_song.mp3');
         this.load.audio('collect', 'assets/sound/elfmail_collect.mp3');
@@ -108,11 +108,12 @@ export default class ElfMail extends Phaser.Scene {
     }
 
     create() {
-
+        var refStart = this.add.sprite(1000,2150,'splash_art',0).setDepth(5000).setScale(1.2,1.2);
         this.messages = (this.cache.text.get('messages') as string).split('\n');
 
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.cursors.space.on('down',function(){refStart.destroy()});
 
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value

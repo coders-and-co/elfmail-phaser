@@ -13,7 +13,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     jumpJustPressed = false;
     hasDoubleJump = false;
     fallThru = false;
-    graceJumpTimer = 100; // ms
+    graceJumpTimer = 120; // ms
     fallThruTimer = 333; // ms
 
     touchingWire: Phaser.GameObjects.Line|null = null;

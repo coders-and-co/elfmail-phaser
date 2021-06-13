@@ -113,7 +113,18 @@ export default class ElfMail extends Phaser.Scene {
 
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.cursors.space.on('down',function(){refStart.destroy()});
+        var scene = this;
+        this.cursors.space.on('down',function() {
+            scene.add.tween({
+                targets: [refStart],
+                alpha: 0,
+                duration: 1000,
+                ease: 'Power2',
+                onComplete: () => {
+                    refStart.destroy();
+                }
+            });
+        })
 
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value

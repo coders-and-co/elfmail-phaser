@@ -15,7 +15,7 @@ export default class FallState extends BaseState {
         this.graceFrames = params.graceFrames;
         if (params.fallThru) {
             this.sprite.fallThru = true;
-            this.fallThruTimer = 60;
+            this.fallThruTimer = 50;
         } else {
             this.sprite.fallThru = false;
         }

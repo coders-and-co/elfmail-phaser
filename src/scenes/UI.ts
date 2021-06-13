@@ -74,9 +74,9 @@ export default class ElfMailUI extends Phaser.Scene {
         if (existingIndicator) {
             // console.log('Existing!')
             // console.log(texture);
-            existingIndicator.image.setTexture('i2');
-            // existingIndicator.image.destroy();
-            // existingIndicator.image = image;
+            // existingIndicator.image.setTexture('i2');
+            existingIndicator.image.destroy();
+            existingIndicator.image = image;
         } else {
 
             this.indicators.push({

@@ -342,8 +342,10 @@ export default class ElfMail extends Phaser.Scene {
     }
 
     collected(this: [this, Delivery]){
+
         this[0].misty.exclaim('misty_collect');
         this[0].playSound('collect')
+        this[0].windowLocations.push({x: this[1].sender.x, y: this[1].sender.y})
         this[1].sender.destroy();
         this[1].letter.body.enable = false;
         this[1].letter.anims.play('letter_get', true);

@@ -8,8 +8,6 @@ import Bird from "../Objects/Bird";
 import { Delivery, Point, DeliveryState } from '../types';
 
 
-
-
 export default class ElfMail extends Phaser.Scene {
 
     ui!: UI;
@@ -21,6 +19,7 @@ export default class ElfMail extends Phaser.Scene {
     letterMessages: any;
     themeMusic: any;
     score: number = 0;
+
     messages: string[] = [];
     usedMessages: string[] = [];
 
@@ -30,7 +29,7 @@ export default class ElfMail extends Phaser.Scene {
 
     preload() {
         // map
-        this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/city.json');
+        this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/tutorial.json');
 
         this.load.text('messages', 'assets/letter/messages.txt');
 
@@ -164,59 +163,60 @@ export default class ElfMail extends Phaser.Scene {
 
         // process wires
         const wires = city.getObjectLayer('Wires');
-        for (const w of wires.objects) {
-            // console.log(w);
-            if (w.type == 'wire' && w.polyline && w.x && w.y) {
-                const points: {x: number, y: number}[] = [];
-                let ox = city.widthInPixels;
-                let oy = city.heightInPixels;
-                for (let p of w.polyline) {
-                    if (typeof p.x !== 'undefined' && typeof p.y !== 'undefined') {
-                        let point = {x: w.x + p.x, y: w.y + p.y};
-                        ox = Math.min(ox, point.x);
-                        oy = Math.min(oy, point.y);
-                        points.push(point);
+        if (wires) {
+            for (const w of wires.objects) {
+                // console.log(w);
+                if (w.type == 'wire' && w.polyline && w.x && w.y) {
+                    const points: {x: number, y: number}[] = [];
+                    let ox = city.widthInPixels;
+                    let oy = city.heightInPixels;
+                    for (let p of w.polyline) {
+                        if (typeof p.x !== 'undefined' && typeof p.y !== 'undefined') {
+                            let point = {x: w.x + p.x, y: w.y + p.y};
+                            ox = Math.min(ox, point.x);
+                            oy = Math.min(oy, point.y);
+                            points.push(point);
+                        }
                     }
+                    let tp = points.map((p) => ({x: p.x - ox, y: p.y - oy}));
+                    let wire = this.add.line(ox, oy, tp[0].x, tp[0].y, tp[1].x, tp[1].y);
+                    // polygon(ox, oy, translatedPoints);
+                    wire.setOrigin(0, 0);
+                    wire.setStrokeStyle(5, 0xFFFFFF);
+                    wire.setLineWidth(5);
+
+                    this.physics.add.existing(wire, true);
+                    this.physics.add.collider(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
+                    this.physics.add.overlap(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
                 }
-                let tp = points.map((p) => ({x: p.x - ox, y: p.y - oy}));
-                let wire = this.add.line(ox, oy, tp[0].x, tp[0].y, tp[1].x, tp[1].y);
-                // polygon(ox, oy, translatedPoints);
-                wire.setOrigin(0, 0);
-                wire.setStrokeStyle(5, 0xFFFFFF);
-                wire.setLineWidth(5);
-
-                this.physics.add.existing(wire, true);
-                this.physics.add.collider(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
-                this.physics.add.overlap(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
-
             }
         }
 
-
         // process spawn triggers
         const triggers = city.getObjectLayer('Spawn Triggers');
+        if (triggers) {
+            for (const t of triggers.objects) {
 
-        for (const t of triggers.objects) {
+                if (!t.x || !t.y) {
+                    continue;
+                }
 
-            if (!t.x || !t.y) {
-                continue;
+                switch (t.type) {
+
+                    case 'player':
+                        this.misty.setPosition(t.x, t.y);
+                        break;
+                    case 'window':
+                        this.windowLocations.push({x: t.x + 100, y: t.y + 100});
+                        break;
+                    case 'bird':
+                        var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1);
+                        this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
+
+                        break;
+                }
+
             }
-
-            switch (t.type) {
-
-                case 'player':
-                    this.misty.setPosition(t.x, t.y);
-                    break;
-                case 'window':
-                    this.windowLocations.push({x: t.x + 100, y: t.y + 100});
-                    break;
-                case 'bird':
-                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1);
-                    this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
-
-                    break;
-            }
-
         }
 
         // spawn letters

@@ -165,7 +165,7 @@ export default class Demo extends Phaser.Scene {
     physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Tilemaps.Tile) {
 
         if (this == obj1 && [9, 10, 11].includes(obj2.index)) {
-            if(obj1.body.velocity.y < 0) {
+            if(obj1.body.velocity.y <= 0 && obj2.faceTop && obj1.body.bottom > obj2.getTop()) {
                 return false;
             }
         }

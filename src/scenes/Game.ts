@@ -43,14 +43,14 @@ export default class ElfMail extends Phaser.Scene {
         this.load.spritesheet('misty_deliver', 'assets/misty_animations/deliver_animation.png', {frameWidth: 100, frameHeight: 150});
 
         this.load.spritesheet('letter_animation', 'assets/letter/letter_animation.png', {frameWidth: 100, frameHeight: 100});
-        this.load.spritesheet('bird_resting', 'assets/misc_animations/bird_idle.png', {frameWidth: 100, frameHeight: 100});
-
         this.load.spritesheet('letter_get', 'assets/letter/letter_get.png', {frameWidth: 100, frameHeight: 100});
-
-
         this.load.image('letter', 'assets/letter/letter.png');
-        this.load.spritesheet('computer_peep', 'assets/peeps/computer_peep.png', {frameWidth: 200, frameHeight: 200});
-        this.load.spritesheet('phone_peep', 'assets/peeps/phone_peep.png', {frameWidth: 200, frameHeight: 200});
+
+        this.load.spritesheet('bird_resting', 'assets/misc_animations/bird_idle.png', {frameWidth: 100, frameHeight: 100});
+        this.load.spritesheet('bird_flying', 'assets/misc_animations/bird_flying.png', {frameWidth: 100, frameHeight: 100});
+
+        this.load.spritesheet('all_peeps', 'assets/peeps/random_peep.png', {frameWidth: 200, frameHeight: 200});
+
         //this.load.text('messages', 'assets/letter/Messages_for_Misty');
         this.load.audio('theme', 'assets/sound/elfmail_theme.mp3');
         this.load.audio('collect', 'assets/sound/elfmail_collect.mp3');
@@ -63,17 +63,18 @@ export default class ElfMail extends Phaser.Scene {
     addNewDelivery() {
 
        const  indexSender = Math.floor(Math.random() * this.windowLocations.length);
-        //const indexSender = 0;
-
         const pointSender = this.windowLocations.splice(indexSender, 1)[0];
         const indexReceiver = Math.floor(Math.random() * this.windowLocations.length);
-        //const indexReceiver = 12;
-
         const pointReceiver = this.windowLocations.splice(indexReceiver, 1)[0];
 
+        const peep1 = Math.floor(Math.random() * 4);
+        const peep2 = Math.floor(Math.random() * 4);
+        console.log(peep1, peep2)
+        console.log(peep1*2, peep2*2)
+
         const delivery = {
-            sender: new Peep(this, this.physics.world, pointSender.x, pointSender.y, 'computer_peep', 1, true),
-            receiver: new Peep(this, this.physics.world, pointReceiver.x, pointReceiver.y, 'phone_peep', 1, false),
+            sender: new Peep(this, this.physics.world, pointSender.x, pointSender.y, 'all_peeps', 1, true, peep1, peep1*2 ),
+            receiver: new Peep(this, this.physics.world, pointReceiver.x, pointReceiver.y, 'all_peeps', 1, false, peep2, peep2*2 ),
             letter: new Letter(this, this.physics.world, pointSender.x, pointSender.y - 100, 'letter', 1, LetterTypes.love),
             message: 'watermelons on sale',
             state: DeliveryState.Waiting,
@@ -89,16 +90,12 @@ export default class ElfMail extends Phaser.Scene {
 
     create() {
 
-
-
-
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
         // this.letterMessages = fetch('Messages_for_Misty.txt')
         //     .then(response => {return [response.text()]})
         //     .then(text => console.log(text))
         // console.log(this.letterMessages);
-
 
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
@@ -110,13 +107,10 @@ export default class ElfMail extends Phaser.Scene {
 
         this.ui.misty = this.misty;
 
-
         this.themeMusic = this.sound.add('theme');
         this.themeMusic.play({
             loop: true
         });
-
-
 
         // Load Tilemap
         const city = this.make.tilemap({ key: 'city_tilemap' });
@@ -199,8 +193,9 @@ export default class ElfMail extends Phaser.Scene {
                     this.windowLocations.push({x: t.x + 100, y: t.y + 100});
                     break;
                 case 'bird':
-                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1)
-                    this.add.existing(newBird);
+                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1);
+                    this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
+
                     break;
             }
 
@@ -297,8 +292,6 @@ export default class ElfMail extends Phaser.Scene {
         this[1].state = DeliveryState.PickedUp;
         this[0].ui.addIndicator(this[1]);
     }
-
-
     destroyLetter(){
         arguments[0].letter.destroy()
     }
@@ -307,8 +300,6 @@ export default class ElfMail extends Phaser.Scene {
         if(!this[1].sender.body){
 
             this[0].score = this[0].score + 1;
-            this[0].ui.updateScore(this[0].score)
-
             this[0].misty.exclaim('misty_deliver', 1000);
             this[0].playSound('deliver')
             this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});

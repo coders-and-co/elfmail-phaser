@@ -11,7 +11,7 @@ export default class Peep extends Phaser.GameObjects.Sprite {
         y: 0,
     }
 
-    constructor(scene:Scene, world: Phaser.Physics.Arcade.World, x: number, y: number, texture: string, id: number, sender: boolean, frame?: number) {
+    constructor(scene:Scene, world: Phaser.Physics.Arcade.World, x: number, y: number, texture: string, id: number, sender: boolean, peepNumber: number, frame?: number) {
 
         super(scene, x, y, texture, frame); // The frame is optional
 
@@ -30,12 +30,12 @@ export default class Peep extends Phaser.GameObjects.Sprite {
         this.setDepth(0);
 
         this.anims.create({
-            key: 'computer_peep',
-            frames: this.anims.generateFrameNumbers('computer_peep', { start: 0, end: 1 }),
+            key: 'peep_animation',
+            frames: this.anims.generateFrameNumbers('all_peeps', { start: peepNumber*2, end: ((peepNumber * 2) + 1) }),
             frameRate: 1,
             repeat: -1
         });
-        this.anims.play('computer_peep', true);
+        this.anims.play('peep_animation', true);
 
     }
 

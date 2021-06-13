@@ -105,10 +105,6 @@ export default class ElfMail extends Phaser.Scene {
 
         // Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
-        // this.letterMessages = fetch('Messages_for_Misty.txt')
-        //     .then(response => {return [response.text()]})
-        //     .then(text => console.log(text))
-        // console.log(this.letterMessages);
 
         // Misty
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
@@ -322,7 +318,11 @@ export default class ElfMail extends Phaser.Scene {
             this[0].ui.updateScore(this[0].score);
             this[0].misty.exclaim('misty_deliver', 1000);
             this[0].playSound('deliver')
-            this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
+            var ref = this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
+            var timer = this[0].misty.scene.time.delayedCall(5000, function(){
+                ref.destroy();
+            }, undefined, this);
+
             // create new delivery to replaced completed one
             this[0].addNewDelivery();
             // add window location back

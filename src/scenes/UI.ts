@@ -26,6 +26,9 @@ export default class ElfMailUI extends Phaser.Scene {
         this.center.y = 1080 / 2;
         this.scoreText = this.add.text(this.cameras.main.midPoint.x + 450, this.cameras.main.midPoint.y - 500, 'Letters e(lf)-mailed: ' + 0, { fontFamily: 'Courier', fontSize: '30px', })
         //.setScrollFactor(0);
+        for (const i of this.indicators) {
+            i.image.setTexture('i1'      );
+        }
     }
 
     update(time: number, delta: number) {
@@ -45,7 +48,7 @@ export default class ElfMailUI extends Phaser.Scene {
             }
             let pos = this.center.clone().add(d)
             i.image.setPosition(pos.x, pos.y);
-            i.image.setTexture('i1');
+
         }
 
     }
@@ -70,6 +73,8 @@ export default class ElfMailUI extends Phaser.Scene {
 
         if (existingIndicator) {
             // console.log('Existing!')
+            // console.log(texture);
+            // existingIndicator.image.setTexture('i2');
             existingIndicator.image.destroy();
             existingIndicator.image = image;
         } else {

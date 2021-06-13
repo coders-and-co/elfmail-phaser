@@ -108,7 +108,7 @@ export default class ElfMail extends Phaser.Scene {
     }
 
     create() {
-        var refStart = this.add.sprite(1000,2150,'splash_art',0).setDepth(5000).setScale(1.2,1.2);
+        var refStart = this.add.sprite(1000,2550,'splash_art',0).setDepth(5000).setScale(1.2,1.2);
         this.messages = (this.cache.text.get('messages') as string).split('\n');
 
         // Keyboard Controls
@@ -223,6 +223,8 @@ export default class ElfMail extends Phaser.Scene {
             }
         }
 
+        // clear window locations
+        this.windowLocations = [];
 
         // process spawn triggers
         const triggers = city.getObjectLayer('Spawn Triggers');
@@ -319,9 +321,6 @@ export default class ElfMail extends Phaser.Scene {
 
         const obj2Tile = (obj2 as unknown) as Phaser.Tilemaps.Tile;
 
-
-
-
         // !this.fallThru, // misty isn't falling thru\
         // we're observing a platform tile
         if ([9, 10, 11].includes(obj2Tile.index)) {
@@ -329,13 +328,13 @@ export default class ElfMail extends Phaser.Scene {
             // jumping or falling thru
             if (obj1.body.velocity.y < 0 || this.fallThru) {
                 return false;
-            } else if (obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop()) {
+            } else if (obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop() + 1 && Math.abs(this.body.velocity.y) < 200) {
+                // && this.body.velocity.y < 20 // && obj1.body.bottom >= obj2Tile.getTop() // obj2Tile.faceTop
+                // console.log(this.body.velocity.y);
                 return false;
             }
             return true;
-
         }
-
         return true;
     }
 
@@ -345,8 +344,12 @@ export default class ElfMail extends Phaser.Scene {
     }
 
     collected(this: [this, Delivery]){
+
         this[0].misty.exclaim('misty_collect');
         this[0].playSound('collect')
+
+        this[0].windowLocations.push({x: this[1].sender.x, y: this[1].sender.y})
+
         this[1].sender.destroy();
         this[1].letter.body.enable = false;
         this[1].letter.anims.play('letter_get', true);

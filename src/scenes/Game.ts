@@ -55,6 +55,11 @@ export default class Demo extends Phaser.Scene {
         this.load.spritesheet('misty_double_jump', 'assets/misty_animations/double_jump_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_slide', 'assets/misty_animations/slide_animation.png', {frameWidth: 100, frameHeight: 150});
         this.load.spritesheet('misty_collect', 'assets/misty_animations/collect_animation.png', {frameWidth: 100, frameHeight: 150});
+        this.load.spritesheet('misty_deliver', 'assets/misty_animations/deliver_animation.png', {frameWidth: 100, frameHeight: 150});
+
+        this.load.spritesheet('letter_animation', 'assets/letter/letter_animation.png', {frameWidth: 100, frameHeight: 100});
+        this.load.spritesheet('letter_get', 'assets/letter/letter_get.png', {frameWidth: 100, frameHeight: 100});
+
 
         this.load.image('letter', 'assets/letter/letter.png');
         this.load.spritesheet('computer_peep', 'assets/peeps/computer_peep.png', {frameWidth: 200, frameHeight: 200});
@@ -89,8 +94,6 @@ export default class Demo extends Phaser.Scene {
 
         this.deliveries.push(delivery);
 
-        console.log('delivery', delivery);
-        console.log(this.deliveries.length);
         this.physics.add.overlap(delivery.letter, this.misty, this.collected, undefined, [this, delivery]);
         this.physics.add.overlap(delivery.receiver, this.misty, this.deliver, undefined, [this, delivery]);
     }
@@ -111,10 +114,8 @@ export default class Demo extends Phaser.Scene {
         this.themeMusic.play({
             loop: true
         });
-        console.log(this.cameras.main.x, this.cameras.main.y)
-        this.scoreText = this.add.text(this.cameras.main.midPoint.x + 800, this.cameras.main.midPoint.y - 500, 'score', { fontFamily: 'Courier', fontSize: '30px'});
 
-
+        this.scoreText = this.add.text(this.cameras.main.midPoint.x + 450, this.cameras.main.midPoint.y - 500, 'Letters e(lf)-mailed: ' + this.score, { fontFamily: 'Courier', fontSize: '30px', }).setScrollFactor(0);
 
         // Load Tilemap
         const city = this.make.tilemap({ key: 'city_tilemap' });
@@ -193,9 +194,6 @@ export default class Demo extends Phaser.Scene {
             }
         }
 
-        console.log('WINDOW LOCATIONS:');
-        console.log(this.windowLocations);
-
         // spawn letters
         for (let x of Array(3)) {
             this.addNewDelivery();
@@ -272,25 +270,26 @@ export default class Demo extends Phaser.Scene {
     }
 
     update(time: number, delta: number) {
-
         this.misty.update(time, delta);
-        // console.log(this.cameras.main)
-        this.scoreText.x = this.cameras.main.midPoint.x + 800;
-        this.scoreText.y = this.cameras.main.midPoint.y - 500;
-
-
+        this.scoreText.setText('Letters e(lf)-mailed: ' + this.score);
     }
 
     collected(this: [this, Delivery]){
-        this[0].misty.exclaim();
+        this[0].misty.exclaim('misty_collect');
         this[0].playSound('collect')
         this[1].sender.destroy();
-        this[1].letter.destroy();
+        this[1].letter.disableInteractive();
+        this[1].letter.anims.play('letter_get', true);
+        var timer = this[0].time.delayedCall(800, this[0].destroyLetter, [this[1]]);
+    }
+    destroyLetter(){
+        arguments[0].letter.destroy()
     }
 
     deliver(this: [this, Delivery]) {
         if(!this[1].sender.body){
-            this[0].misty.exclaim();
+            this[0].score = this[0].score + 1;
+            this[0].misty.exclaim('misty_deliver', 1000);
             this[0].playSound('deliver')
             this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});
             // create new delivery to replaced completed one

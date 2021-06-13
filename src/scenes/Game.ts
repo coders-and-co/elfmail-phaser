@@ -29,7 +29,7 @@ export default class ElfMail extends Phaser.Scene {
 
     preload() {
         // map
-        this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/tutorial.json');
+        this.load.tilemapTiledJSON('city_tilemap', 'assets/maps/city.json');
 
         this.load.text('messages', 'assets/letter/messages.txt');
 
@@ -197,6 +197,8 @@ export default class ElfMail extends Phaser.Scene {
         if (triggers) {
             for (const t of triggers.objects) {
 
+                console.log(t);
+
                 if (!t.x || !t.y) {
                     continue;
                 }
@@ -218,6 +220,8 @@ export default class ElfMail extends Phaser.Scene {
 
             }
         }
+
+        console.log(this.windowLocations);
 
         // spawn letters
         for (let x of Array(3)) {

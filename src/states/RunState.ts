@@ -33,7 +33,7 @@ export default class RunState extends BaseState {
     update(): StateReturn|void {
 
         if (!this.sprite.body.onFloor()) {
-            return { type: FallState , params: { graceFrames: this.sprite.graceFrames }}
+            return { type: FallState , params: { graceJump: true }}
         } else if (this.sprite.jumpJustPressed) {
             return { type: JumpState };
         } else if (!this.cursors.right.isDown && !this.cursors.left.isDown) {

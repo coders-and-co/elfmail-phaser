@@ -31,13 +31,10 @@ export default class RunState extends BaseState {
     }
 
     update(): StateReturn|void {
-        // console.log('update: direction:', this.direction);
-        if (this.cursors.space.isUp) {
-            this.sprite.inJumpState = false;
-        }
+
         if (!this.sprite.body.onFloor()) {
             return { type: FallState , params: { graceFrames: this.sprite.graceFrames }}
-        } else if (this.cursors.space.isDown && !this.sprite.inJumpState) {
+        } else if (this.sprite.jumpJustPressed) {
             return { type: JumpState };
         } else if (!this.cursors.right.isDown && !this.cursors.left.isDown) {
             return { type: IdleState };

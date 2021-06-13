@@ -24,8 +24,6 @@ export interface Point {
     y: number;
 }
 
-
-
 export default class Demo extends Phaser.Scene {
 
     misty!: Misty;
@@ -179,14 +177,8 @@ export default class Demo extends Phaser.Scene {
 
     update(time: number, delta: number) {
 
-        // collide
-        // this.physics.collideTiles(this.misty, )
+        this.misty.update(time, delta);
 
-        // Update MovementState and respond to state changes
-        const nextState = this.misty.movementState!.update();
-        if (nextState) {
-            this.misty.changeState(nextState);
-        }
     }
 
     collected(this: Delivery){

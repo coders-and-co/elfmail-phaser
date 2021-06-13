@@ -6,17 +6,29 @@ export default class JumpState extends BaseState {
 
     name = 'jump';
 
-    enter() {
-        this.sprite.anims.play('misty_jump', true);
-        this.sprite.body.setVelocityY(-this.sprite.jumpPower);
-        this.sprite.inJumpState = true;
+    isDouble: boolean = false;
+
+    enter(params: { isDouble: boolean }) {
+
+        if (params.isDouble) {
+            this.isDouble = true;
+        }
+        if (this.isDouble) {
+            this.sprite.anims.play('misty_jump', true);
+            this.sprite.body.setVelocityY(-this.sprite.jumpPower);
+            this.sprite.hasDoubleJump = false;
+        } else {
+            this.sprite.anims.play('misty_jump', true);
+            this.sprite.body.setVelocityY(-this.sprite.jumpPower);
+        }
+
     }
 
     update(): StateReturn|void {
-        if (this.cursors.space.isUp) {
-            this.sprite.inJumpState = false;
-        }
-        if (this.sprite.body.velocity.y > 0) {
+
+        if (!this.isDouble && this.sprite.jumpJustPressed) {
+            return { type: JumpState, params: { isDouble: true }};
+        } else if (this.sprite.body.velocity.y > 0) {
             return { type: FallState };
         } else if (this.sprite.body.onFloor()) {
             // Keep this state in case you jump directly to a platform and never attain + velocity

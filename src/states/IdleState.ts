@@ -10,13 +10,11 @@ export default class IdleState extends BaseState {
     enter(params: {}) {
         this.sprite.body.setVelocityX(0);
         this.sprite.anims.play('misty_idle', true);
+        this.sprite.hasDoubleJump = true;
     }
 
     update(): StateReturn|void {
-        if (this.cursors.space.isUp) {
-            this.sprite.inJumpState = false;
-        }
-        if (this.cursors.space.isDown && this.sprite.body.onFloor() && !this.sprite.inJumpState) {
+        if (this.sprite.jumpJustPressed && this.sprite.body.onFloor()) {
             return { type: JumpState };
         } else if (this.cursors.left.isDown) {
             return { type: RunState, params: { direction: Direction.Left }};

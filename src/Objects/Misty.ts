@@ -10,9 +10,12 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     runSpeed = 800;
     jumpPower = 1200;
-    inJumpState = false;
+    jumpJustPressed = false;
+    hasDoubleJump = false;
 
     graceFrames = 8;
+
+
 
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
 
@@ -23,6 +26,9 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
         // save referece to cursors
         this.cursors = cursors;
+
+        // set jump handler
+        cursors.space.on('down', this.handleJump.bind(this));
 
         // add Misty to the Physics world
         this.body = new Phaser.Physics.Arcade.Body(world, this);
@@ -69,8 +75,24 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     }
 
+    update(time: number, delta: number) {
+
+        // Update MovementState and respond to state changes
+        const nextState = this.movementState!.update();
+        if (nextState) {
+            this.changeState(nextState);
+        }
+        this.jumpJustPressed = false;
+    }
+
+    handleJump() {
+        // console.log('SPACE!');
+        this.jumpJustPressed = true;
+        // console.log(this);
+    }
+
     changeState(nextState: StateReturn) {
-        // console.log(nextState.type.name);
+        console.log(nextState.type.name, nextState.params);
         if (this.movementState != null) {
             this.movementState.exit();
         }

@@ -13,11 +13,22 @@ export default class FallState extends BaseState {
         this.graceFrames = params.graceFrames;
     }
 
+    exit() {
+
+    }
+
     update(): StateReturn|void {
-        if (this.graceFrames > 0 && this.cursors.space.isDown) {
-            return { type: JumpState };
+
+        if (this.sprite.jumpJustPressed) {
+            if (this.graceFrames > 0) {
+                return { type: JumpState };
+            } else if (this.sprite.hasDoubleJump) {
+                return { type: JumpState, params: { isDouble: true }};
+            }
+        } else {
+            this.graceFrames = this.graceFrames - 1;
         }
-        this.graceFrames = this.graceFrames - 1;
+
         if (this.sprite.body.onFloor()) {
             return { type: IdleState };
         } else {

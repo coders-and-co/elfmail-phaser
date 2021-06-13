@@ -122,7 +122,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     }
 
     changeState(nextState: StateReturn) {
-        console.log(nextState.type.name, nextState.params);
+        // console.log(nextState.type.name, nextState.params);
         if (this.movementState != null) {
             this.movementState.exit();
         }

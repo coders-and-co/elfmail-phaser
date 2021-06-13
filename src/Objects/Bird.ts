@@ -32,7 +32,7 @@ export default class Bird extends Phaser.GameObjects.Sprite {
         // this.body.setCollideWorldBounds(true);
         this.body.setSize(165, 55);
         this.body.setOffset(-30,45);
-        this.setDepth(0);
+        this.setDepth(1);
 
         this.anims.create({
             key: 'bird_resting',

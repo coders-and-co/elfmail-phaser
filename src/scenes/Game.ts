@@ -300,6 +300,7 @@ export default class ElfMail extends Phaser.Scene {
         if(!this[1].sender.body){
 
             this[0].score = this[0].score + 1;
+            this[0].ui.updateScore(this[0].score);
             this[0].misty.exclaim('misty_deliver', 1000);
             this[0].playSound('deliver')
             this[0].add.text(this[1].receiver.x, this[1].receiver.y, this[1].message, { fontFamily: 'Courier', fontSize: '30px'});

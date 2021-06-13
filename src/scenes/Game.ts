@@ -4,6 +4,7 @@ import Letter, {LetterTypes} from "../Objects/Letter";
 // import City from "../city";
 import Peep from "../Objects/Peep";
 import enable = Phaser.Display.Canvas.Smoothing.enable;
+import Bird from "../Objects/Bird";
 
 
 enum DeliveryState {
@@ -59,6 +60,8 @@ export default class Demo extends Phaser.Scene {
         this.load.spritesheet('misty_deliver', 'assets/misty_animations/deliver_animation.png', {frameWidth: 100, frameHeight: 150});
 
         this.load.spritesheet('letter_animation', 'assets/letter/letter_animation.png', {frameWidth: 100, frameHeight: 100});
+        this.load.spritesheet('bird_resting', 'assets/misc_animations/bird_idle.png', {frameWidth: 100, frameHeight: 100});
+
         this.load.spritesheet('letter_get', 'assets/letter/letter_get.png', {frameWidth: 100, frameHeight: 100});
 
 
@@ -199,7 +202,8 @@ export default class Demo extends Phaser.Scene {
                     this.windowLocations.push({x: t.x + 100, y: t.y + 100});
                     break;
                 case 'bird':
-                    this.add.circle(t.x, t.y, 15, 0xFF0000);
+                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1)
+                    this.add.newBird;
                     break;
             }
 

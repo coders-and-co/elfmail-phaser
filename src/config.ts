@@ -17,14 +17,6 @@ export default {
         gravity: { y: 2000 },
         debug: true,
     },
-    // matter: {
-    //     enableSleeping: true,
-    //     gravity: { y: 1 },
-    //     debug: {
-    //         showBody: true,
-    //         showStaticBody: true
-    //     }
-    // }
   },
 
 };

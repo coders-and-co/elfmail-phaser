@@ -35,7 +35,12 @@ export default class RunState extends BaseState {
         if (!this.sprite.body.onFloor()) {
             return { type: FallState , params: { graceJump: true }}
         } else if (this.sprite.jumpJustPressed) {
-            return { type: JumpState };
+            if (this.cursors.down.isDown) {
+                return { type: FallState, params: { fallThru: true }};
+            } else {
+                return { type: JumpState };
+            }
+            // return { type: JumpState };
         } else if (!this.cursors.right.isDown && !this.cursors.left.isDown) {
             return { type: IdleState };
         } else if (this.cursors.left.isDown && this.direction !== Direction.Left) {

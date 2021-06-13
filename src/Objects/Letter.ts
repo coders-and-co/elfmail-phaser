@@ -32,6 +32,7 @@ export default class Letter extends Phaser.GameObjects.Sprite {
         this.world = world;
         this.id = id;
         this.deliveryState = LetterStates.waiting;
+        this.setDepth(99);
         // add letter to the scene
         scene.add.existing(this); // add letter to this scene
 

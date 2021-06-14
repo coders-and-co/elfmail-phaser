@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="./blob/main/public/assets/splash_art.png?raw=true" alt="header" width="600"/>
+  <img src="https://github.com/sixthgear/joined-together/blob/main/public/assets/splash_art.png?raw=true" width="600"/>
   <br>
   E(lf)-Mail
   <br>

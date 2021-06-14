@@ -1,12 +1,33 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/geocine/phaser3-rollup-typescript#readme"><img src="https://i.imgur.com/6lcIxDs.png" alt="header" width="600"/></a>
+  <img src="./blob/main/public/assets/splash_art.png?raw=true" alt="header" width="600"/>
   <br>
-  Phaser 3 TypeScript Starter
+  E(lf)-Mail
   <br>
 </h1>
 
-This is a [Phaser 3](https://github.com/photonstorm/phaser) starter with [TypeScript](https://www.typescriptlang.org/), [Rollup](https://rollupjs.org) with ⚡️ lightning fast HMR through [Vite](https://vitejs.dev/).
+Play as an elf who picks up and delivers mail between the windowsills of a charming city. In this relaxing platformer, make use of a satisfying movement system to hop, slide, spin, and dance between the rooftops.
+
+This short game was developed in 48 hours for the [Game Maker's Toolkit Game Jam 2021](https://dentrala.itch.io/elf-mail), which features the theme "Joined Together". Even when people cannot be together, there are still ways to stay connected. This game introduces a whimsical approach to the words, "no one is an island".
+
+We hope you enjoy helping join people together. (and scaring the pigeons!)
+
+~~~~~~~~~~~
+
+Arrow Keys to Move, Space to jump, Down+Space to drop.
+Grab the bouncing envelope to collect it, and bring it to the right window to deliver it.
+
+~~~~~~~~~~~
+
+- Joshua Cender: Developer
+- Erin Baird: Developer
+- Andrew Martin: Art, Animations, Music, SFX.
+- Kara Cender: Writing, Breakfast Engineering.
+
+This game was developed using Phaser, Tiled, Clip Studio Paint, and Coffee.
+
+Created in Vancouver, Canada.
+
 
 ## Available Commands
 

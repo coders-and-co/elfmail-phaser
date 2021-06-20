@@ -16,6 +16,16 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     graceJumpTimer = 120; // ms
     fallThruTimer = 333; // ms
 
+    // particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
+    particles!: {
+        sparks: Phaser.GameObjects.Particles.ParticleEmitterManager;
+        stars: Phaser.GameObjects.Particles.ParticleEmitterManager;
+        sparkles: Phaser.GameObjects.Particles.ParticleEmitterManager;
+        poofs: Phaser.GameObjects.Particles.ParticleEmitterManager;
+    }
+
+
+
     touchingWire: Phaser.GameObjects.Line|null = null;
 
 
@@ -26,6 +36,115 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
         // add Misty to the scene
         scene.add.existing(this); // add Misty to this scene
+
+
+        this.particles = {
+            sparks: scene.add.particles('sparks'),
+            stars: scene.add.particles('stars'),
+            sparkles: scene.add.particles('sparkles'),
+            poofs: scene.add.particles('poofs'),
+        }
+
+        this.particles.sparks.createEmitter({
+            on: false,
+            follow: this,
+            followOffset: {x: 0, y: 85},
+            speed: 500,
+            gravityY: 1000,
+            lifespan: 500,
+            blendMode: 'ADD', // 'ADD'
+            frequency: 20,
+            angle: { min: 240, max: 300 },
+            frame: {
+                frames: [0,1,2,3],
+                cycle: false,
+            }
+        });
+
+        this.particles.stars.createEmitter({
+            name: 'jump',
+            on: false,
+            follow: this,
+            followOffset: {x: 0, y: 50},
+            alpha: { start: 1, end: 0.5},
+            scale: { start: 2, end: 0.3 },
+            rotate: { min: 0, max: 360},
+            speed: 400,
+            gravityY: 100,
+            lifespan: 300,
+            blendMode: 'ADD', // 'ADD'
+            frequency: 0,
+            quantity: 7,
+            angle: { min: 0, max: 180 },
+            frame: {
+                frames: [0,1],
+                cycle: true,
+            }
+        });
+
+        this.particles.stars.createEmitter({
+            name: 'deliver',
+            on: false,
+            follow: this,
+            followOffset: {x: 0, y: -25},
+            alpha: { start: 0.5, end: 0.2},
+            scale: { start: 2, end: 1 },
+            rotate: { min: 0, max: 360},
+            speed: { min: 500, max: 600},
+            gravityY: 400,
+            lifespan: 600,
+            blendMode: 'ADD', // 'ADD'
+            frequency: 0,
+            quantity: 15,
+            frame: {
+                frames: [0,1],
+                cycle: true,
+            }
+        });
+
+        this.particles.sparkles.createEmitter({
+            on: false,
+            follow: this,
+            followOffset: {x: 0, y: 85},
+            speed: 20,
+            alpha: { start: 1, end: 0},
+            gravityY: 100,
+            lifespan: 1000,
+            blendMode: 'ADD', // 'ADD'
+            frequency: 60,
+            // angle: { min: 240, max: 300 },
+            frame: {
+                frames: [0,1],
+                cycle: true,
+            }
+        });
+
+        this.particles.poofs.createEmitter({
+            on: false,
+            follow: this,
+            alpha: { start: 0.5, end: 0},
+            rotate: { min: 0, max: 360},
+            // scale: { start: 2, end: 0.3 },
+            speed: 300,
+            gravityY: 500,
+            lifespan: 250,
+            blendMode: 'SCREEN', // 'ADD'
+            frequency: 0,
+            followOffset: {x: 0, y: 85},
+            quantity: 7,
+            angle: { min: 180, max: 360 },
+            frame: {
+                frames: [0,1],
+                cycle: true,
+            }
+        });
+
+
+        // this.particles.stars.createEmitter({
+        //     ...starsConfig,
+        //     angle: { min: 120, max: 180 },
+        // });
+
 
         // save referece to cursors
         this.cursors = cursors;

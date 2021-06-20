@@ -21,12 +21,18 @@ export default class JumpState extends BaseState {
             this.sprite.hasDoubleJump = false;
             this.playSound('doublejump')
 
+            // this.sprite.particles.stars.emitters.getByName('jump')!.emitParticle();
+            this.sprite.particles.sparkles.emitters.first.start();
+
         } else {
             this.sprite.anims.play('misty_jump', true);
             this.sprite.body.setVelocityY(-this.sprite.jumpPower);
             this.playSound('jump')
         }
+    }
 
+    exit() {
+        this.sprite.particles.sparkles.emitters.first.stop();
     }
 
     update(): StateReturn|void {

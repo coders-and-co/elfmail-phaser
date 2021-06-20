@@ -19,7 +19,7 @@ export default class JumpState extends BaseState {
             this.sprite.anims.play('misty_double_jump', true);
             this.sprite.body.setVelocityY(-this.sprite.jumpPower);
             this.sprite.hasDoubleJump = false;
-            this.playSound('doublejump')
+            this.playSound('doublejump', 0.5);
 
             // this.sprite.particles.stars.emitters.getByName('jump')!.emitParticle();
             this.sprite.particles.sparkles.emitters.first.start();
@@ -27,7 +27,7 @@ export default class JumpState extends BaseState {
         } else {
             this.sprite.anims.play('misty_jump', true);
             this.sprite.body.setVelocityY(-this.sprite.jumpPower);
-            this.playSound('jump')
+            this.playSound('jump', 0.5);
         }
     }
 
@@ -45,7 +45,7 @@ export default class JumpState extends BaseState {
             return { type: FallState };
         } else if (this.sprite.body.onFloor() && this.jumpTimer > 3) {
             // Keep this state in case you jump directly to a platform and never attain + velocity
-            this.playSound('landing', 0.5)
+            this.playSound('landing', 0.33);
             return { type: IdleState };
         } else {
 

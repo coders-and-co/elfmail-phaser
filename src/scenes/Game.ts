@@ -357,7 +357,7 @@ export default class ElfMail extends Phaser.Scene {
     collected(this: [this, Delivery]){
 
         this[0].misty.exclaim('misty_collect');
-        this[0].playSound('collect')
+        this[0].playSound('collect', 0.5);
 
         this[0].windowLocations.push({x: this[1].sender.x, y: this[1].sender.y})
 
@@ -382,7 +382,7 @@ export default class ElfMail extends Phaser.Scene {
             scene.score = scene.score + 1;
             scene.ui.updateScore(scene.score);
             scene.misty.exclaim('misty_deliver', 1000);
-            scene.playSound('deliver')
+            scene.playSound('deliver', 0.5);
             scene.misty.particles.stars.emitters.getByName('deliver')!.emitParticle();
             // delivery.receiver.x, delivery.receiver.y
 
@@ -424,10 +424,11 @@ export default class ElfMail extends Phaser.Scene {
         }
     }
 
-    playSound(name: string){
+    playSound(name: string, volume?: number){
         var soundEffect = this.sound.add(name);
         soundEffect.play({
-            loop: false
+            loop: false,
+            volume: volume? volume : 1
         });
     }
 

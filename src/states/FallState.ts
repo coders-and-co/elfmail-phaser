@@ -52,7 +52,7 @@ export default class FallState extends BaseState {
         if (this.sprite.touchingWire) {
             return { type: SlideState }
         } else if (!this.sprite.fallThru && this.sprite.body.onFloor()) {
-            this.playSound('landing', 0.5)
+            this.playSound('landing', 0.25)
             // this.sprite.particles.poofs.emitParticle();
             return { type: IdleState };
         } else {

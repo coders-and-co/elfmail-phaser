@@ -62,7 +62,7 @@ export default class BaseState {
             if (this.sprite.body.velocity.x < this.sprite.runSpeed) {
                 this.sprite.body.velocity.x += 45;
             } else if (this.sprite.body.velocity.x > this.sprite.runSpeed) {
-                this.sprite.body.velocity.x *= 0.995;
+                this.sprite.body.velocity.x *= 0.999;
             }
         }
     }

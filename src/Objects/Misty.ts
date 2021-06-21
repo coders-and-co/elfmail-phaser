@@ -14,7 +14,9 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     hasDoubleJump = false;
     fallThru = false;
     graceJumpTimer = 120; // ms
-    fallThruTimer = 333; // ms
+    fallThruTimer = 333; //  ms
+    velcocityXDampen = 0.88;
+    velcocityXDampenAir = 0.96;
 
     // particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
     particles!: {

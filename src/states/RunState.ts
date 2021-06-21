@@ -1,12 +1,9 @@
-import BaseState, { StateReturn } from './BaseState'
+import BaseState, { StateReturn, Direction } from './BaseState'
 import IdleState from './IdleState';
 import JumpState from "./JumpState";
 import FallState from './FallState';
 
-export enum Direction {
-    Left,
-    Right
-}
+
 
 export default class RunState extends BaseState {
 
@@ -19,12 +16,12 @@ export default class RunState extends BaseState {
         if (params.direction === Direction.Left) {
             // console.log('left', this.direction);
             this.direction = Direction.Left;
-            this.sprite.body.setVelocityX(this.sprite.runSpeed * -1);
+            // this.sprite.body.setVelocityX(this.sprite.runSpeed * -1);
             this.sprite.setFlip(true, false);
         } else if (params.direction === Direction.Right) {
             // console.log('right', this.direction);
             this.direction = Direction.Right;
-            this.sprite.body.setVelocityX(this.sprite.runSpeed);
+            // this.sprite.body.setVelocityX(this.sprite.runSpeed);
             this.sprite.setFlip(false, false);
         }
 
@@ -47,6 +44,10 @@ export default class RunState extends BaseState {
             return {type: RunState, params: { direction: Direction.Left }};
         } else if (this.cursors.right.isDown && !this.cursors.left.isDown && this.direction !== Direction.Right) {
             return { type: RunState, params: { direction: Direction.Right }};
+        }
+
+        if (this.direction != null) {
+            this.updateVelocityX(this.direction);
         }
     }
 }

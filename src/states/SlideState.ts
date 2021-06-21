@@ -1,4 +1,4 @@
-import BaseState, { StateReturn } from './BaseState'
+import BaseState, { StateReturn, Direction } from './BaseState'
 import FallState from './FallState';
 import JumpState from './JumpState';
 
@@ -18,6 +18,7 @@ export default class SlideState extends BaseState {
         this.sprite.body.stop();
         // emit sparks
         this.sprite.particles.sparks.emitters.first.start();
+        this.sprite.hasDoubleJump = true;
 
     }
 
@@ -64,7 +65,11 @@ export default class SlideState extends BaseState {
             }
 
             let a = this.sprite.body.position.clone().subtract(target).normalize();
-            this.sprite.body.setVelocityX(a.x * 1000);
+
+            if (Math.abs(this.sprite.body.velocity.x) < this.sprite.runSpeed * 2.0) {
+                this.sprite.body.velocity.x += a.x * 50;
+            }
+
         }
     }
 }

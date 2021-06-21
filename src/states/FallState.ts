@@ -1,6 +1,5 @@
-import BaseState, { StateReturn } from './BaseState'
+import BaseState, { StateReturn, Direction } from './BaseState'
 import IdleState from './IdleState';
-import {Direction} from "./RunState";
 import JumpState from "./JumpState";
 import SlideState from "./SlideState";
 
@@ -58,12 +57,14 @@ export default class FallState extends BaseState {
         } else {
             if (this.cursors.left.isDown) {
                 this.sprite.setFlip(true, false);
-                this.sprite.body.setVelocityX(-this.sprite.runSpeed);
+                // this.sprite.body.setVelocityX(-this.sprite.runSpeed);
+                this.updateVelocityX(Direction.Left);
             } else if (this.cursors.right.isDown) {
                 this.sprite.setFlip(false, false);
-                this.sprite.body.setVelocityX(this.sprite.runSpeed);
+                // this.sprite.body.setVelocityX(this.sprite.runSpeed);
+                this.updateVelocityX(Direction.Right);
             } else {
-                this.sprite.body.velocity.x = this.sprite.body.velocity.x * 0.90;
+                this.sprite.body.velocity.x *= this.sprite.velcocityXDampenAir;
             }
         }
     }

@@ -1,5 +1,12 @@
 import Phaser, { GameObjects, Scene } from 'phaser';
 import Misty from '../Objects/Misty';
+// import { Direction } from './RunState';
+
+
+export enum Direction {
+    Left,
+    Right
+}
 
 export interface StateReturn {
     type: typeof BaseState;
@@ -35,6 +42,27 @@ export default class BaseState {
             loop: false,
             volume: volume? volume : 1
         });
+    }
+
+
+    updateVelocityX(direction: Direction) {
+        if (direction == Direction.Left){
+            if (this.sprite.body.velocity.x > 0.1) {
+                this.sprite.body.velocity.x -= 24;
+            } else if (this.sprite.body.velocity.x > -this.sprite.runSpeed) {
+                this.sprite.body.velocity.x -= 16;
+            } else if (this.sprite.body.velocity.x < -this.sprite.runSpeed) {
+                this.sprite.body.velocity.x *= 0.99;
+            }
+        } else if (direction == Direction.Right) {
+            if (this.sprite.body.velocity.x < -0.1) {
+                this.sprite.body.velocity.x += 24
+            } else if (this.sprite.body.velocity.x < this.sprite.runSpeed) {
+                this.sprite.body.velocity.x += 16;
+            } else if (this.sprite.body.velocity.x > this.sprite.runSpeed) {
+                this.sprite.body.velocity.x *= 0.99;
+            }
+        }
     }
 
 }

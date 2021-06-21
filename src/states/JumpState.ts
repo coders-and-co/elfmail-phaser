@@ -1,4 +1,4 @@
-import BaseState, { StateReturn } from './BaseState'
+import BaseState, { StateReturn, Direction } from './BaseState'
 import IdleState from './IdleState';
 import FallState from './FallState';
 
@@ -45,7 +45,7 @@ export default class JumpState extends BaseState {
             return { type: FallState };
         } else if (this.sprite.body.onFloor() && this.jumpTimer > 3) {
             // Keep this state in case you jump directly to a platform and never attain + velocity
-            this.playSound('landing', 0.33);
+            this.playSound('landing', 0.25);
             return { type: IdleState };
         } else {
 
@@ -56,13 +56,18 @@ export default class JumpState extends BaseState {
 
             if (this.cursors.left.isDown) {
                 this.sprite.setFlip(true, false);
-                this.sprite.body.setVelocityX(-this.sprite.runSpeed);
+                // this.sprite.body.setVelocityX(-this.sprite.runSpeed);
+                this.updateVelocityX(Direction.Left);
             } else if (this.cursors.right.isDown) {
                 this.sprite.setFlip(false, false);
-                this.sprite.body.setVelocityX(this.sprite.runSpeed);
+                // this.sprite.body.setVelocityX(this.sprite.runSpeed);
+                this.updateVelocityX(Direction.Right);
             } else {
-                this.sprite.body.velocity.x *= 0.90;
+                this.sprite.body.velocity.x *= this.sprite.velcocityXDampenAir;
             }
         }
+
+
+
     }
 }

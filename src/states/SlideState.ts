@@ -101,7 +101,7 @@ export default class SlideState extends BaseState {
             } else {
                 return { type: JumpState };
             }
-        } else if (factor > 1.05) { // factor < -0.05 ||
+        } else if (factor < -0.1 || factor > 1.05) { //
             if (this.sprite.body.onFloor()) {
                 return { type: IdleState }
             } else {

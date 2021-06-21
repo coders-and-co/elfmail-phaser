@@ -20,7 +20,7 @@ export default class ElfMail extends Phaser.Scene {
     themeMusic: any;
     score: number = 0;
 
-    tutorial = false;
+    tutorial = true;
 
     messages: string[] = [];
     usedMessages: string[] = [];

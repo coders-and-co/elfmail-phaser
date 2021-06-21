@@ -28,8 +28,8 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     // jumping constants
     jumpPower = 1200;           // velocity.y impluse for jumping
     graceJumpTimer = 120;       // ms to allow a jump input following a run off an edge
-    fallThruPower = 500;        // velocity.y to add when falling thru
-    fallThruTimer = 333;        // ms to disable collisions when misty falls thru a platform
+    fallThruPower = 400;        // velocity.y to add when falling thru
+    fallThruTimer = 300;        // ms to disable collisions when misty falls thru a platform
     jumpDecay = 0.90;           // amount to decay velocity.y per frame when jump button released
     jumpJustPressed = false;    // was the jump button pressed on the current frame?
     hasDoubleJump = false;      // does misty have a double jump available?

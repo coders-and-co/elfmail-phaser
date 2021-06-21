@@ -49,5 +49,6 @@ export default class RunState extends BaseState {
         if (this.direction != null) {
             this.updateVelocityX(this.direction);
         }
+
     }
 }

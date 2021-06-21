@@ -44,27 +44,22 @@ export default class BaseState {
         });
     }
 
-
     updateVelocityX(direction: Direction) {
+
         if (direction == Direction.Left){
-            // if (this.sprite.body.velocity.x > 0.1) {
-            //     this.sprite.body.velocity.x -= 24;
-            // } else
-            if (this.sprite.body.velocity.x > -this.sprite.runSpeed) {
-                this.sprite.body.velocity.x -= 45;
-            } else if (this.sprite.body.velocity.x < -this.sprite.runSpeed) {
-                this.sprite.body.velocity.x *= 0.99;
+            if (this.sprite.body.velocity.x > -this.sprite.maxSpeed.run) {
+                this.sprite.body.velocity.x -= this.sprite.acceleration.run;
+            } else if (this.sprite.body.velocity.x < -this.sprite.maxSpeed.run) {
+                this.sprite.body.velocity.x *= this.sprite.dampenVelocity.overMax;
             }
         } else if (direction == Direction.Right) {
-            // if (this.sprite.body.velocity.x < -0.1) {
-            //     this.sprite.body.velocity.x += 24
-            // } else
-            if (this.sprite.body.velocity.x < this.sprite.runSpeed) {
-                this.sprite.body.velocity.x += 45;
-            } else if (this.sprite.body.velocity.x > this.sprite.runSpeed) {
-                this.sprite.body.velocity.x *= 0.999;
+            if (this.sprite.body.velocity.x < this.sprite.maxSpeed.run) {
+                this.sprite.body.velocity.x += this.sprite.acceleration.run;
+            } else if (this.sprite.body.velocity.x > this.sprite.maxSpeed.run) {
+                this.sprite.body.velocity.x *= this.sprite.dampenVelocity.overMax;
             }
         }
+
     }
 
 }

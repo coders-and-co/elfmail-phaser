@@ -16,7 +16,9 @@ export default class IdleState extends BaseState {
 
     update(): StateReturn|void {
 
-        this.sprite.body.velocity.x *= this.sprite.velcocityXDampen;
+        if (this.sprite.body.velocity.x != 0) {
+            this.sprite.body.velocity.x *= this.sprite.dampenVelocity.ground;
+        }
 
         if (this.sprite.jumpJustPressed && this.sprite.body.onFloor()) {
             if (this.cursors.down.isDown) {

@@ -8,15 +8,35 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     body: Phaser.Physics.Arcade.Body;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
-    runSpeed = 800;
-    jumpPower = 1200;
-    jumpJustPressed = false;
-    hasDoubleJump = false;
-    fallThru = false;
-    graceJumpTimer = 120; // ms
-    fallThruTimer = 333; //  ms
-    velcocityXDampen = 0.88;
-    velcocityXDampenAir = 0.96;
+    // horizontal movement maximums (these can be exceeded, but they will dampen/decay)
+    maxSpeed = {
+        run: 800,               // misty's max running speed
+        slide: 2400,            // misty's max sliding speed
+    }
+    // horizontal acceleration
+    acceleration = {
+        run: 45,
+        slide: 50,
+    }
+    // dampening factors for different conditions
+    dampenVelocity = {
+        ground: 0.88,           // dampening factor when idle on ground
+        air: 0.96,              // dampening factor when jumping/falling without pushing left or right
+        overMax: 0.997,         // dampening factor to apply when moving over any maximum
+    }
+
+    // jumping constants
+    jumpPower = 1200;           // velocity.y impluse for jumping
+    graceJumpTimer = 120;       // ms to allow a jump input following a run off an edge
+    fallThruPower = 500;        // velocity.y to add when falling thru
+    fallThruTimer = 333;        // ms to disable collisions when misty falls thru a platform
+    jumpDecay = 0.90;           // amount to decay velocity.y per frame when jump button released
+    jumpJustPressed = false;    // was the jump button pressed on the current frame?
+    hasDoubleJump = false;      // does misty have a double jump available?
+    fallThru = false;           // is misty currently falling thru?
+
+    // tracks the wire misty is currently sliding on (if any)
+    touchingWire: Phaser.GameObjects.Line|null = null;
 
     // particles: Phaser.GameObjects.Particles.ParticleEmitterManager;
     particles!: {
@@ -27,8 +47,6 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     }
 
 
-
-    touchingWire: Phaser.GameObjects.Line|null = null;
 
 
 

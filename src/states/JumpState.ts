@@ -51,19 +51,17 @@ export default class JumpState extends BaseState {
 
             if (!this.cursors.space.isDown) {
                 // decay jump when space released
-                this.sprite.body.velocity.y *= 0.90;
+                this.sprite.body.velocity.y *= this.sprite.jumpDecay;
             }
 
             if (this.cursors.left.isDown) {
                 this.sprite.setFlip(true, false);
-                // this.sprite.body.setVelocityX(-this.sprite.runSpeed);
                 this.updateVelocityX(Direction.Left);
             } else if (this.cursors.right.isDown) {
                 this.sprite.setFlip(false, false);
-                // this.sprite.body.setVelocityX(this.sprite.runSpeed);
                 this.updateVelocityX(Direction.Right);
             } else {
-                this.sprite.body.velocity.x *= this.sprite.velcocityXDampenAir;
+                this.sprite.body.velocity.x *= this.sprite.dampenVelocity.air;
             }
         }
 

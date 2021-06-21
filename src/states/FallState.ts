@@ -15,6 +15,8 @@ export default class FallState extends BaseState {
             this.graceJumpTimer = this.sprite.graceJumpTimer;
         }
         if (params.fallThru) {
+            // add extra downward force!
+            this.sprite.body.setVelocityY(this.sprite.fallThruPower);
             this.sprite.fallThru = true;
             this.fallThruTimer = this.sprite.fallThruTimer;
         } else {
@@ -57,14 +59,12 @@ export default class FallState extends BaseState {
         } else {
             if (this.cursors.left.isDown) {
                 this.sprite.setFlip(true, false);
-                // this.sprite.body.setVelocityX(-this.sprite.runSpeed);
                 this.updateVelocityX(Direction.Left);
             } else if (this.cursors.right.isDown) {
                 this.sprite.setFlip(false, false);
-                // this.sprite.body.setVelocityX(this.sprite.runSpeed);
                 this.updateVelocityX(Direction.Right);
             } else {
-                this.sprite.body.velocity.x *= this.sprite.velcocityXDampenAir;
+                this.sprite.body.velocity.x *= this.sprite.dampenVelocity.air;
             }
         }
     }

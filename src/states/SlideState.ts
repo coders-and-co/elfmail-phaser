@@ -1,4 +1,5 @@
-import BaseState, { StateReturn, Direction } from './BaseState'
+import BaseState, { StateReturn } from './BaseState';
+import { Direction } from '../Objects/Misty';
 import IdleState from './IdleState';
 import FallState from './FallState';
 import JumpState from './JumpState';
@@ -38,11 +39,11 @@ export default class SlideState extends BaseState {
             if (this.pointTop.x < this.pointBottom.x) {
                 // this.wireDirection = Direction.Right;
                 this.sprite.setFlip(false, false);
-                this.mistyOffset = 7;
+                this.mistyOffset = 10;
             } else {
                 // this.wireDirection = Direction.Left;
                 this.sprite.setFlip(true, false);
-                this.mistyOffset = -7;
+                this.mistyOffset = -10;
             }
 
             // find a unit vector (length 1.0) pointing towards the lower end of the wire
@@ -63,7 +64,6 @@ export default class SlideState extends BaseState {
         // emit sparks
         this.sprite.particles.sparks.emitters.first.start();
         this.sprite.hasDoubleJump = true;
-
         this.sprite.anims.play('misty_slide', true);
     }
 
@@ -92,16 +92,18 @@ export default class SlideState extends BaseState {
 
     update(): StateReturn|void {
 
+        const controls = this.getControls();
+
         let factor = this.calculateWireFactor();
         // console.log('FACTOR:', factor);
 
         if (this.sprite.jumpJustPressed) {
-            if (this.cursors.down.isDown) {
+            if (controls.down) {
                 return { type: FallState, params: { fallThru: true }};
             } else {
                 return { type: JumpState };
             }
-        } else if (factor < -0.1 || factor > 1.05) { //
+        } else if (factor < -0.025 || factor > 1.05) { //
             if (this.sprite.body.onFloor()) {
                 return { type: IdleState }
             } else {
@@ -113,8 +115,6 @@ export default class SlideState extends BaseState {
             // const wire = this.sprite.touchingWire;
 
             let wireHeight = this.pointTop.y + (this.pointBottom.y - this.pointTop.y) * factor;
-
-
 
             // snap misty to the wire position
             this.sprite.setY(wireHeight - (this.sprite.height / 2) + this.mistyOffset);

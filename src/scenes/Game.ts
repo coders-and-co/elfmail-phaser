@@ -14,6 +14,7 @@ export default class ElfMail extends Phaser.Scene {
     misty!: Misty;
     letter!: Letter;
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+    // gamepad!: Phaser.Input.Gamepad.Gamepad;
     deliveries: Delivery[] = [];
     windowLocations: Point[] = [];
     letterMessages: any;
@@ -117,10 +118,15 @@ export default class ElfMail extends Phaser.Scene {
         var refStart = this.add.sprite(1000,2550,'splash_art',0).setDepth(5000).setScale(1.2,1.2);
         this.messages = (this.cache.text.get('messages') as string).split('\n');
 
-        // Keyboard Controls
+        // Controls
         this.cursors = this.input.keyboard.createCursorKeys();
+        // this.gamepad = this.input.gamepad.getPad(1);
+        // console.log(this.gamepad);
+
         var scene = this;
-        this.cursors.space.on('down',function() {
+
+        // fade the title screen out
+        this.cursors.space.on('down', function() {
             scene.add.tween({
                 targets: [refStart],
                 alpha: 0,
@@ -132,20 +138,15 @@ export default class ElfMail extends Phaser.Scene {
             });
         })
 
-        // Misty
-        // TODO: Spawn her at the map's spawn point instead of a hardcoded value
-        this.misty = new Misty(this, this.physics.world, this.cursors, 200, 9500, 'misty_idle');
-
         this.ui = this.scene.add('ui', new UI({
             active: true,
         }), true) as UI;
 
+        // TODO: Spawn her at the map's spawn point instead of a hardcoded value
+        this.misty = new Misty(this, this.physics.world, this.cursors, 0, 0, 'misty_idle');
         this.ui.misty = this.misty;
 
-        // this.add.particles('particles')
-
         this.loadCity();
-
     }
 
     loadCity() {
@@ -169,13 +170,11 @@ export default class ElfMail extends Phaser.Scene {
             city = this.make.tilemap({ key: 'city_tilemap' });
         }
 
-
         // add the tileset image we are using
-        // const test_tileset = city.addTilesetImage('tiles_sheet', 'test_tiles');
         const base_tileset = city.addTilesetImage('tileset_buildings', 'city_tiles');
 
         // load layers
-
+        // ---
         // 'BG Parallax 1' (image)
         // 'BG Parallax 2' (image)
         // 'BG Parallax 3' (image)
@@ -184,14 +183,6 @@ export default class ElfMail extends Phaser.Scene {
         // 'Overlay Tiles'
         // 'Wires'
         // 'Triggers'
-
-        // const bgLayers = [
-        //     map.createLayer('BG Parallax 1', tileset),
-        //     map.createLayer('BG Parallax 2', tileset),
-        //     map.createLayer('BG Parallax 3', tileset),
-        // ]
-        // console.log('Image Layers:');
-        // console.log(city.images);
 
         const tileLayers = [
             city.createLayer('Background Tiles', base_tileset),
@@ -224,7 +215,6 @@ export default class ElfMail extends Phaser.Scene {
                     wire.setLineWidth(5);
 
                     this.physics.add.existing(wire, true);
-                    this.physics.add.collider(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
                     this.physics.add.overlap(this.misty, wire, this.physicsCollideWire, this.physicsProcessWire, this.misty);
                 }
             }
@@ -239,23 +229,21 @@ export default class ElfMail extends Phaser.Scene {
             for (const t of triggers.objects) {
                 if (!t.x || !t.y) continue;
                 switch (t.type) {
-
-                case 'player':
-                    this.misty.setPosition(t.x, t.y);
-                    break;
-                case 'window':
-                    this.windowLocations.push({x: t.x + 100, y: t.y + 100});
-                    break;
-                case 'bird':
-                    var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1, t.name == 'right');
-                    this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
-                    break;
+                    case 'player':
+                        // Misty
+                        this.misty.setPosition(t.x, t.y);
+                        break;
+                    case 'window':
+                        this.windowLocations.push({x: t.x + 100, y: t.y + 100});
+                        break;
+                    case 'bird':
+                        var newBird = new Bird(this, this.physics.world, t.x + 8, t.y-45, 'bird_resting', 1, t.name == 'right');
+                        this.physics.add.overlap(newBird, this.misty, newBird.fly, undefined, newBird);
+                        break;
                 }
 
             }
         }
-
-        // console.log(this.windowLocations.length);
 
         // spawn letters
         if (this.tutorial) {
@@ -267,13 +255,23 @@ export default class ElfMail extends Phaser.Scene {
         }
 
         tileLayers[0].setDepth(-1);
-        tileLayers[1].setCollisionFromCollisionGroup(true);
         tileLayers[2].setDepth(100);
 
-        // Misty should collide with the the foreground map layer
-        // this.physics.add.collider(this.misty, tileLayers[1])
+        // recalculate faces first, because if we do it after adding the one-way platforms,
+        // we'll make odd holes in the ground when a platform is directly above a solid block!
+        tileLayers[1].setCollision([207, 247], true);
+
+        tileLayers[1].forEachTile(t => {
+            switch (t.index) {
+                case 11:
+                    // one-way platforms
+                    t.setCollision(false, false, true, false, false);
+                    break;
+            }
+        });
+
+        // this.physics.add.collider(this.misty, tileLayers[1]);
         this.physics.add.collider(this.misty, tileLayers[1], this.physicsCollisionPlatform, this.physicsProcessPlatform, this.misty);
-        // this.physics.add.overlap(this.letter, this.misty, this.letter.collected, undefined, this.letter);
 
         // Camera and Physics Bounds
         this.physics.world.setBounds(0, 0, city.widthInPixels, city.heightInPixels);
@@ -313,15 +311,7 @@ export default class ElfMail extends Phaser.Scene {
     }
 
     physicsCollideWire(misty: Phaser.Types.Physics.Arcade.GameObjectWithBody, wire: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
-        // let w = (wire as Phaser.GameObjects.Line)
-        // let wireGeom = w.geom as Phaser.Geom.Line;
-        // let y1 = wire.body.y + wireGeom.y1;
-        // let y2 = wire.body.y + wireGeom.y2;
-        // let factor = (misty.body.x - wire.body.x) / (wire.body.width);
-        // // interpolate
-        // let y = y1 + ((y2-y1) * factor);
-        // misty.body.stop();
-        // misty.body.y = y - misty.body.height;
+        // collide with the wire?
     }
 
     physicsCollisionPlatform(obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
@@ -331,21 +321,17 @@ export default class ElfMail extends Phaser.Scene {
     physicsProcessPlatform(this: Misty, obj1: Phaser.Types.Physics.Arcade.GameObjectWithBody, obj2: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
 
         const obj2Tile = (obj2 as unknown) as Phaser.Tilemaps.Tile;
-
-        // !this.fallThru, // misty isn't falling thru\
-        // we're observing a platform tile
-        if ([9, 10, 11].includes(obj2Tile.index)) {
-
-            // jumping or falling thru
-            if (obj1.body.velocity.y < 0 || this.fallThru) {
+        if (obj2Tile.index == 11) {
+            if (this.fallThru ) {
                 return false;
-            } else if (obj2Tile.faceTop && obj1.body.bottom > obj2Tile.getTop() + 1 && Math.abs(this.body.velocity.y) < 200) {
-                // && this.body.velocity.y < 20 // && obj1.body.bottom >= obj2Tile.getTop() // obj2Tile.faceTop
-                // console.log(this.body.velocity.y);
+            } else if (this.body.velocity.y <= 0) {
                 return false;
             }
-            return true;
+            // else if (obj1.body.bottom > obj2Tile.getTop()) {
+            //     return false;
+            // }
         }
+        // collide with full tile
         return true;
     }
 
@@ -353,6 +339,7 @@ export default class ElfMail extends Phaser.Scene {
         this.misty.update(time, delta);
         // this.ui.updateScore(this.score);
     }
+
 
     collected(this: [this, Delivery]){
 
@@ -407,10 +394,10 @@ export default class ElfMail extends Phaser.Scene {
                 scene.addNewDelivery();
 
                 // add window location back
-                scene.windowLocations.push({x: delivery.receiver.x, y: delivery.receiver.y})
+                scene.windowLocations.push({x: delivery.receiver.x, y: delivery.receiver.y});
                 scene.deliveries.splice(scene.deliveries.indexOf(delivery),1);
             } else {
-                 console.log('TUTORIAL COMPLETE');
+                console.log('TUTORIAL COMPLETE');
                 var timerA = scene.time.delayedCall(2000, function() {
                     scene.cameras.main.fadeOut(2500, 0, 0, 0);
                 }, undefined, this);

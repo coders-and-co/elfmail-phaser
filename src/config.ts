@@ -4,6 +4,9 @@ export default {
   type: Phaser.AUTO,
   parent: 'game',
   backgroundColor: '#33A5E7',
+  input: {
+    gamepad: true
+  },
   scale: {
     width: 1920,
     height: 1080,
@@ -13,7 +16,8 @@ export default {
   physics: {
     default: 'arcade',
     arcade: {
-        tileBias: 100,
+        tileBias: 100, // 16
+        // overlapBias: 100, // 4
         gravity: { y: 2000 },
         debug: false,
     },

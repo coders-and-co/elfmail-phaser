@@ -1,4 +1,5 @@
-import BaseState, { StateReturn, Direction } from './BaseState'
+import BaseState, { StateReturn } from './BaseState';
+import { Direction } from '../Objects/Misty';
 import IdleState from './IdleState';
 import JumpState from "./JumpState";
 import SlideState from "./SlideState";
@@ -30,6 +31,8 @@ export default class FallState extends BaseState {
 
     update(delta: number): StateReturn|void {
 
+        const controls = this.getControls();
+
         if (this.fallThruTimer > 0) {
             this.fallThruTimer -= delta;
             if (this.fallThruTimer <= 0) {
@@ -57,12 +60,12 @@ export default class FallState extends BaseState {
             // this.sprite.particles.poofs.emitParticle();
             return { type: IdleState };
         } else {
-            if (this.cursors.left.isDown) {
+            if (controls.left) {
                 this.sprite.setFlip(true, false);
-                this.updateVelocityX(Direction.Left);
-            } else if (this.cursors.right.isDown) {
+                this.sprite.updateVelocityX(Direction.Left);
+            } else if (controls.right) {
                 this.sprite.setFlip(false, false);
-                this.updateVelocityX(Direction.Right);
+                this.sprite.updateVelocityX(Direction.Right);
             } else {
                 this.sprite.body.velocity.x *= this.sprite.dampenVelocity.air;
             }

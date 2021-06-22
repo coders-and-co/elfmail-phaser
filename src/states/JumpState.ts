@@ -1,4 +1,5 @@
-import BaseState, { StateReturn, Direction } from './BaseState'
+import BaseState, { StateReturn } from './BaseState';
+import { Direction } from '../Objects/Misty';
 import IdleState from './IdleState';
 import FallState from './FallState';
 
@@ -37,6 +38,8 @@ export default class JumpState extends BaseState {
 
     update(): StateReturn|void {
 
+        const controls = this.getControls();
+
         this.jumpTimer++;
 
         if (!this.isDouble && this.sprite.jumpJustPressed && this.jumpTimer > 3) {
@@ -49,17 +52,17 @@ export default class JumpState extends BaseState {
             return { type: IdleState };
         } else {
 
-            if (!this.cursors.space.isDown) {
+            if (!controls.jump) {
                 // decay jump when space released
                 this.sprite.body.velocity.y *= this.sprite.jumpDecay;
             }
 
-            if (this.cursors.left.isDown) {
+            if (controls.left) {
                 this.sprite.setFlip(true, false);
-                this.updateVelocityX(Direction.Left);
-            } else if (this.cursors.right.isDown) {
+                this.sprite.updateVelocityX(Direction.Left);
+            } else if (controls.right) {
                 this.sprite.setFlip(false, false);
-                this.updateVelocityX(Direction.Right);
+                this.sprite.updateVelocityX(Direction.Right);
             } else {
                 this.sprite.body.velocity.x *= this.sprite.dampenVelocity.air;
             }

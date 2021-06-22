@@ -8,7 +8,7 @@ export default class Bird extends Phaser.GameObjects.Sprite {
     rightFacing: boolean;
     flyingHome: boolean = false;
     originalXCoord: number;
-    flapSpeed: number = 5;
+    flapSpeed: number = 7;
     coordinates = {
         x: 0,
         y: 0,

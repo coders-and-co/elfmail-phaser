@@ -2,11 +2,17 @@ import Phaser, { Scene } from 'phaser';
 import BaseState, { StateReturn } from '../states/BaseState';
 import IdleState from '../states/IdleState';
 
+export enum Direction {
+    Left,
+    Right
+}
+
 export default class Misty extends Phaser.GameObjects.Sprite {
 
     movementState: BaseState|null = null;
     body: Phaser.Physics.Arcade.Body;
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+    gamepad: Phaser.Input.Gamepad.Gamepad|null = null;
 
     // horizontal movement maximums (these can be exceeded, but they will dampen/decay)
     maxSpeed = {
@@ -15,14 +21,15 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     }
     // horizontal acceleration
     acceleration = {
-        run: 45,
-        slide: 50,
+        run: 32,                // acceleration when running
+        turn: 32 * 1.4,         // acceleration when turning around
+        slide: 40,              // acceleration when sliding
     }
     // dampening factors for different conditions
     dampenVelocity = {
-        ground: 0.88,           // dampening factor when idle on ground
-        air: 0.96,              // dampening factor when jumping/falling without pushing left or right
-        overMax: 0.997,         // dampening factor to apply when moving over any maximum
+        ground: 0.75,           // dampening factor when idle on ground
+        air: 0.97,              // dampening factor when jumping/falling without pushing left or right
+        overMax: 0.998,         // dampening factor to apply when moving over any maximum
     }
 
     // jumping constants
@@ -46,12 +53,9 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         poofs: Phaser.GameObjects.Particles.ParticleEmitterManager;
     }
 
-
-
-
-
     constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
 
+        // gamepad: Phaser.Input.Gamepad.Gamepad,
         super(scene, x, y, texture, frame); // The frame is optional
 
         // add Misty to the scene
@@ -142,16 +146,16 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         this.particles.poofs.createEmitter({
             on: false,
             follow: this,
-            alpha: { start: 0.5, end: 0},
+            alpha: { start: 0.4, end: 0.1},
             rotate: { min: 0, max: 360},
-            // scale: { start: 2, end: 0.3 },
-            speed: 300,
-            gravityY: 500,
+            scale: { start: 1, end: 0.5 },
+            speed: 320,
+            gravityY: 1100,
             lifespan: 250,
             blendMode: 'SCREEN', // 'ADD'
-            frequency: 0,
+            frequency: 300,
             followOffset: {x: 0, y: 85},
-            quantity: 7,
+            quantity: 2,
             angle: { min: 180, max: 360 },
             frame: {
                 frames: [0,1],
@@ -168,9 +172,18 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
         // save referece to cursors
         this.cursors = cursors;
+        // this.gamepad = gamepad;
+        // console.log(gamepad);
 
         // set jump handler
         cursors.space.on('down', this.handleJump.bind(this));
+        this.scene.input.gamepad.on('down', function (this: any, pad, button, index) {
+            this.gamepad = pad;
+            if (button.index == 0) {
+                this.handleJump();
+            }
+        }, this);
+
 
         // set rendering depth
         this.setDepth(1);
@@ -256,6 +269,28 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         }
     }
 
+    updateVelocityX(direction: Direction) {
+
+        if (direction == Direction.Left){
+            if (this.body.velocity.x > 0) {
+                this.body.velocity.x -= this.acceleration.turn;
+            } else if (this.body.velocity.x > -this.maxSpeed.run) {
+                this.body.velocity.x -= this.acceleration.run;
+            } else if (this.body.velocity.x < -this.maxSpeed.run) {
+                this.body.velocity.x *= this.dampenVelocity.overMax;
+            }
+        } else if (direction == Direction.Right) {
+            if (this.body.velocity.x < 0) {
+                this.body.velocity.x += this.acceleration.turn;
+            } else if (this.body.velocity.x < this.maxSpeed.run) {
+                this.body.velocity.x += this.acceleration.run;
+            } else if (this.body.velocity.x > this.maxSpeed.run) {
+                this.body.velocity.x *= this.dampenVelocity.overMax;
+            }
+        }
+
+    }
+
     handleJump() {
         this.jumpJustPressed = true;
     }
@@ -265,7 +300,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         if (this.movementState != null) {
             this.movementState.exit();
         }
-        this.movementState = new nextState.type(this, this.cursors);
+        this.movementState = new nextState.type(this, this.cursors); // this.gamepad
         this.movementState.enter(nextState.params || {});
     }
 

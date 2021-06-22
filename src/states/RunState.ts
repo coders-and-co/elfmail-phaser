@@ -1,4 +1,5 @@
-import BaseState, { StateReturn, Direction } from './BaseState'
+import BaseState, { StateReturn } from './BaseState';
+import { Direction } from '../Objects/Misty';
 import IdleState from './IdleState';
 import JumpState from "./JumpState";
 import FallState from './FallState';
@@ -11,43 +12,52 @@ export default class RunState extends BaseState {
     direction: Direction|null = null;
 
     enter(params: { direction: Direction }) {
-
         this.sprite.anims.play('misty_run', true);
         if (params.direction === Direction.Left) {
-            // console.log('left', this.direction);
             this.direction = Direction.Left;
-            // this.sprite.body.setVelocityX(this.sprite.runSpeed * -1);
             this.sprite.setFlip(true, false);
         } else if (params.direction === Direction.Right) {
-            // console.log('right', this.direction);
             this.direction = Direction.Right;
-            // this.sprite.body.setVelocityX(this.sprite.runSpeed);
             this.sprite.setFlip(false, false);
         }
 
     }
 
+    exit() {
+        this.sprite.particles.sparks.emitters.first.stop();
+    }
+
     update(): StateReturn|void {
+
+        const controls = this.getControls();
 
         if (!this.sprite.body.onFloor()) {
             return { type: FallState , params: { graceJump: true }}
         } else if (this.sprite.jumpJustPressed) {
-            if (this.cursors.down.isDown) {
+            if (controls.down) {
                 return { type: FallState, params: { fallThru: true }};
             } else {
                 return { type: JumpState };
             }
-            // return { type: JumpState };
-        } else if (!this.cursors.right.isDown && !this.cursors.left.isDown) {
+        } else if (!controls.right && !controls.left) {
             return { type: IdleState };
-        } else if (this.cursors.left.isDown && !this.cursors.right.isDown && this.direction !== Direction.Left) {
+        } else if (controls.left && !controls.right && this.direction !== Direction.Left) {
             return {type: RunState, params: { direction: Direction.Left }};
-        } else if (this.cursors.right.isDown && !this.cursors.left.isDown && this.direction !== Direction.Right) {
+        } else if (controls.right && !controls.left && this.direction !== Direction.Right) {
             return { type: RunState, params: { direction: Direction.Right }};
+        } else if (this.direction == Direction.Left && this.sprite.body.velocity.x > 0) {
+            this.sprite.anims.play('misty_fall', true);
+            this.sprite.particles.poofs.emitters.first.start();
+        } else if (this.direction == Direction.Right && this.sprite.body.velocity.x < 0) {
+            this.sprite.anims.play('misty_fall', true);
+            this.sprite.particles.poofs.emitters.first.start();
+        } else {
+            this.sprite.anims.play('misty_run', true);
+            this.sprite.particles.poofs.emitters.first.stop();
         }
 
         if (this.direction != null) {
-            this.updateVelocityX(this.direction);
+            this.sprite.updateVelocityX(this.direction);
         }
 
     }

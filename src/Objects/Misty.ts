@@ -16,18 +16,18 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     // horizontal movement maximums (these can be exceeded, but they will dampen/decay)
     maxSpeed = {
-        run: 800,               // misty's max running speed
-        slide: 2400,            // misty's max sliding speed
+        run: 750,               // misty's max running speed
+        slide: 2250,            // misty's max sliding speed
     }
     // horizontal acceleration
     acceleration = {
-        run: 32,                // acceleration when running
-        turn: 32 * 1.4,         // acceleration when turning around
+        run: 32,                 // acceleration when running
+        turn: 32 * 1.33,         // acceleration when turning around
         slide: 40,              // acceleration when sliding
     }
     // dampening factors for different conditions
     dampenVelocity = {
-        ground: 0.75,           // dampening factor when idle on ground
+        ground: 0.80,           // dampening factor when idle on ground
         air: 0.97,              // dampening factor when jumping/falling without pushing left or right
         overMax: 0.998,         // dampening factor to apply when moving over any maximum
     }

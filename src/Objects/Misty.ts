@@ -21,8 +21,8 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     }
     // horizontal acceleration
     acceleration = {
-        run: 32,                 // acceleration when running
-        turn: 32 * 1.33,         // acceleration when turning around
+        run: 25,                 // acceleration when running
+        turn: 30,         // acceleration when turning around
         slide: 40,              // acceleration when sliding
     }
     // dampening factors for different conditions

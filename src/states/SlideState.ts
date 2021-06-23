@@ -3,11 +3,11 @@ import { Direction } from '../Objects/Misty';
 import IdleState from './IdleState';
 import FallState from './FallState';
 import JumpState from './JumpState';
+import { KeyDict, KeyMap } from '../types';
 
 export default class SlideState extends BaseState {
 
     name = 'slide';
-
 
     wire!: Phaser.GameObjects.Line;
     pointTop!: Phaser.Math.Vector2;
@@ -63,7 +63,6 @@ export default class SlideState extends BaseState {
 
         // emit sparks
         this.sprite.particles.sparks.emitters.first.start();
-        this.sprite.hasDoubleJump = true;
         this.sprite.anims.play('misty_slide', true);
     }
 
@@ -88,16 +87,12 @@ export default class SlideState extends BaseState {
         return factor
     }
 
-
-
-    update(): StateReturn|void {
-
-        const controls = this.getControls();
+    update(delta: number, controls: KeyMap): StateReturn|void {
 
         let factor = this.calculateWireFactor();
         // console.log('FACTOR:', factor);
 
-        if (this.sprite.jumpJustPressed) {
+        if (controls.jumpJustPressed) {
             if (controls.down) {
                 return { type: FallState, params: { fallThru: true }};
             } else {
@@ -119,9 +114,17 @@ export default class SlideState extends BaseState {
             // snap misty to the wire position
             this.sprite.setY(wireHeight - (this.sprite.height / 2) + this.mistyOffset);
 
+            let wd = this.wireDirection.x > 0 ? Direction.Right : Direction.Left;
+            let acc = this.sprite.acceleration.slide;
+            if (controls.right && wd == Direction.Right || controls.left && wd == Direction.Left) {
+                acc *= 1.333;
+            } else if (controls.right && wd == Direction.Left || controls.left && wd == Direction.Right) {
+                acc *= 0.5;
+            }
+
             // accelerate along wire (using the x component of the target wireDirection)
             if (Math.abs(this.sprite.body.velocity.x) < this.sprite.maxSpeed.slide) {
-                this.sprite.body.velocity.x += this.sprite.acceleration.slide * this.wireDirection.x;
+                this.sprite.body.velocity.x += acc * this.wireDirection.x;
             }
 
         }

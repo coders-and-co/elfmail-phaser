@@ -19,3 +19,13 @@ export interface Point {
     x: number;
     y: number;
 }
+
+export type KeyDict = {[key: string]: Phaser.Input.Keyboard.Key};
+export interface KeyMap {
+    up: boolean;
+    down: boolean;
+    left: boolean;
+    right: boolean;
+    jump: boolean;
+    jumpJustPressed: boolean;
+};

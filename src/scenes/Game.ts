@@ -1,11 +1,11 @@
-import Phaser, { Physics } from 'phaser';
+import Phaser, { Input, Physics } from 'phaser';
 import Misty from "../Objects/Misty";
 import Letter, {LetterTypes} from "../Objects/Letter";
 import Peep from "../Objects/Peep";
 import UI from './UI';
 import Bird from "../Objects/Bird";
 
-import { Delivery, Point, DeliveryState } from '../types';
+import { Delivery, Point, DeliveryState, KeyDict } from '../types';
 
 
 export default class ElfMail extends Phaser.Scene {
@@ -13,7 +13,10 @@ export default class ElfMail extends Phaser.Scene {
     ui!: UI;
     misty!: Misty;
     letter!: Letter;
-    cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+
+    keys!: KeyDict;
+    gamepad: Input.Gamepad.Gamepad|null = null;
+
     // gamepad!: Phaser.Input.Gamepad.Gamepad;
     deliveries: Delivery[] = [];
     windowLocations: Point[] = [];
@@ -119,15 +122,26 @@ export default class ElfMail extends Phaser.Scene {
         this.messages = (this.cache.text.get('messages') as string).split('\n');
 
         // Controls
-        this.cursors = this.input.keyboard.createCursorKeys();
-        // this.gamepad = this.input.gamepad.getPad(1);
-        // console.log(this.gamepad);
+        // this.cursors = this.input.keyboard.createCursorKeys();
+        this.keys = this.input.keyboard.addKeys({
+            'up': Phaser.Input.Keyboard.KeyCodes.UP,
+            'left': Phaser.Input.Keyboard.KeyCodes.LEFT,
+            'down': Phaser.Input.Keyboard.KeyCodes.DOWN,
+            'right': Phaser.Input.Keyboard.KeyCodes.RIGHT,
+            'w': Phaser.Input.Keyboard.KeyCodes.W,
+            'a': Phaser.Input.Keyboard.KeyCodes.A,
+            's': Phaser.Input.Keyboard.KeyCodes.S,
+            'd': Phaser.Input.Keyboard.KeyCodes.D,
+            'space': Phaser.Input.Keyboard.KeyCodes.SPACE,
+        }) as KeyDict;
 
-        var scene = this;
 
         // fade the title screen out
-        this.cursors.space.on('down', function() {
-            scene.add.tween({
+        const fadeSplash = function(this: ElfMail) {
+            if (!refStart) {
+                return;
+            }
+            this.add.tween({
                 targets: [refStart],
                 alpha: 0,
                 duration: 1000,
@@ -136,14 +150,25 @@ export default class ElfMail extends Phaser.Scene {
                     refStart.destroy();
                 }
             });
-        })
+        }
+
+        const bindGamepad = function(this: ElfMail, pad: Phaser.Types.Input.Gamepad.Pad, button: Phaser.Input.Gamepad.Button, index: number) {
+            this.gamepad = pad as Input.Gamepad.Gamepad;
+            this.misty.gamepad = pad as Input.Gamepad.Gamepad;
+            if (button.index == 0) {
+                fadeSplash.call(this);
+            }
+        }
+
+        this.keys.space.once('down', fadeSplash, this);
+        this.input.gamepad.once('down', bindGamepad, this);
 
         this.ui = this.scene.add('ui', new UI({
             active: true,
         }), true) as UI;
 
         // TODO: Spawn her at the map's spawn point instead of a hardcoded value
-        this.misty = new Misty(this, this.physics.world, this.cursors, 0, 0, 'misty_idle');
+        this.misty = new Misty(this, this.physics.world, this.keys, 0, 0, 'misty_idle');
         this.ui.misty = this.misty;
 
         this.loadCity();

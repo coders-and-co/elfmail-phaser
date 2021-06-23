@@ -1,6 +1,7 @@
-import Phaser, { Scene } from 'phaser';
+import Phaser, { Input, Scene } from 'phaser';
 import BaseState, { StateReturn } from '../states/BaseState';
 import IdleState from '../states/IdleState';
+import { KeyDict, KeyMap } from '../types';
 
 export enum Direction {
     Left,
@@ -11,8 +12,18 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     movementState: BaseState|null = null;
     body: Phaser.Physics.Arcade.Body;
-    cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-    gamepad: Phaser.Input.Gamepad.Gamepad|null = null;
+
+    keys: KeyDict;
+    gamepad: Input.Gamepad.Gamepad|null = null;
+    controls: KeyMap = {
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+        jump: false,
+        jumpJustPressed: false,
+    };
+
 
     // horizontal movement maximums (these can be exceeded, but they will dampen/decay)
     maxSpeed = {
@@ -23,7 +34,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     acceleration = {
         run: 25,                 // acceleration when running
         turn: 30,         // acceleration when turning around
-        slide: 40,              // acceleration when sliding
+        slide: 30,              // acceleration when sliding
     }
     // dampening factors for different conditions
     dampenVelocity = {
@@ -38,9 +49,11 @@ export default class Misty extends Phaser.GameObjects.Sprite {
     fallThruPower = 400;        // velocity.y to add when falling thru
     fallThruTimer = 300;        // ms to disable collisions when misty falls thru a platform
     jumpDecay = 0.90;           // amount to decay velocity.y per frame when jump button released
-    jumpJustPressed = false;    // was the jump button pressed on the current frame?
-    hasDoubleJump = false;      // does misty have a double jump available?
+
+    // hasDoubleJump = false;      // does misty have a double jump available?
     fallThru = false;           // is misty currently falling thru?
+
+    // jumpJustPressed = false;    // was the jump button pressed on the current frame?
 
     // tracks the wire misty is currently sliding on (if any)
     touchingWire: Phaser.GameObjects.Line|null = null;
@@ -53,7 +66,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
         poofs: Phaser.GameObjects.Particles.ParticleEmitterManager;
     }
 
-    constructor(scene:Scene, world: Phaser.Physics.Arcade.World, cursors: Phaser.Types.Input.Keyboard.CursorKeys, x: number, y: number, texture: string, frame?: number) {
+    constructor(scene:Scene, world: Phaser.Physics.Arcade.World, keys: KeyDict, x: number, y: number, texture: string, frame?: number) {
 
         // gamepad: Phaser.Input.Gamepad.Gamepad,
         super(scene, x, y, texture, frame); // The frame is optional
@@ -153,9 +166,9 @@ export default class Misty extends Phaser.GameObjects.Sprite {
             gravityY: 1100,
             lifespan: 250,
             blendMode: 'SCREEN', // 'ADD'
-            frequency: 300,
+            frequency: 500,
             followOffset: {x: 0, y: 85},
-            quantity: 2,
+            // quantity: 2,
             angle: { min: 180, max: 360 },
             frame: {
                 frames: [0,1],
@@ -171,19 +184,7 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
 
         // save referece to cursors
-        this.cursors = cursors;
-        // this.gamepad = gamepad;
-        // console.log(gamepad);
-
-        // set jump handler
-        cursors.space.on('down', this.handleJump.bind(this));
-        this.scene.input.gamepad.on('down', function (this: any, pad, button, index) {
-            this.gamepad = pad;
-            if (button.index == 0) {
-                this.handleJump();
-            }
-        }, this);
-
+        this.keys = keys;
 
         // set rendering depth
         this.setDepth(1);
@@ -258,14 +259,34 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     }
 
+    getControls(prevControls: KeyMap) {
+
+        const controls = {
+            up: this.keys.up.isDown || this.keys.w.isDown || (this.gamepad && this.gamepad.up) || false,
+            down: this.keys.down.isDown || this.keys.s.isDown || (this.gamepad && (this.gamepad.down || this.gamepad.leftStick.y > 0.5)) || false,
+            left: this.keys.left.isDown || this.keys.a.isDown || (this.gamepad && (this.gamepad.left || this.gamepad.leftStick.x < -0.5)) || false,
+            right: this.keys.right.isDown || this.keys.d.isDown || (this.gamepad && (this.gamepad.right || this.gamepad.leftStick.x > 0.5)) || false,
+            jump: this.keys.space.isDown || (this.gamepad && this.gamepad.A) || false,
+            jumpJustPressed: false
+        }
+        if (controls.jump && prevControls.jump === false) {
+            controls.jumpJustPressed = true;
+        }
+
+        return controls;
+    }
+
+
     update(time: number, delta: number) {
+
+        this.controls = this.getControls(this.controls);
+
         if (this.body.moves) {
             // Update MovementState and respond to state changes
-            const nextState = this.movementState!.update(delta);
+            const nextState = this.movementState!.update(delta, this.controls);
             if (nextState) {
                 this.changeState(nextState);
             }
-            this.jumpJustPressed = false;
         }
     }
 
@@ -291,16 +312,12 @@ export default class Misty extends Phaser.GameObjects.Sprite {
 
     }
 
-    handleJump() {
-        this.jumpJustPressed = true;
-    }
-
     changeState(nextState: StateReturn) {
         // console.log(nextState.type.name, nextState.params);
         if (this.movementState != null) {
-            this.movementState.exit();
+            this.movementState.exit(nextState.type);
         }
-        this.movementState = new nextState.type(this, this.cursors); // this.gamepad
+        this.movementState = new nextState.type(this); // this.gamepad
         this.movementState.enter(nextState.params || {});
     }
 

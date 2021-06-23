@@ -3,8 +3,7 @@ import { Direction } from '../Objects/Misty';
 import IdleState from './IdleState';
 import JumpState from "./JumpState";
 import FallState from './FallState';
-
-
+import { KeyDict, KeyMap } from '../types';
 
 export default class RunState extends BaseState {
 
@@ -13,27 +12,19 @@ export default class RunState extends BaseState {
 
     enter(params: { direction: Direction }) {
         this.sprite.anims.play('misty_run', true);
-        if (params.direction === Direction.Left) {
-            this.direction = Direction.Left;
-            this.sprite.setFlip(true, false);
-        } else if (params.direction === Direction.Right) {
-            this.direction = Direction.Right;
-            this.sprite.setFlip(false, false);
-        }
-
+        this.direction = params.direction;
+        this.sprite.setFlip(this.direction == Direction.Left, false);
     }
 
     exit() {
-        this.sprite.particles.sparks.emitters.first.stop();
+        // this.sprite.particles.sparks.emitters.first.stop();
     }
 
-    update(): StateReturn|void {
-
-        const controls = this.getControls();
+    update(delta: number, controls: KeyMap): StateReturn|void {
 
         if (!this.sprite.body.onFloor()) {
             return { type: FallState , params: { graceJump: true }}
-        } else if (this.sprite.jumpJustPressed) {
+        } else if (controls.jumpJustPressed) {
             if (controls.down) {
                 return { type: FallState, params: { fallThru: true }};
             } else {

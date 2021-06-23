@@ -3,20 +3,17 @@ import Misty, { Direction } from '../Objects/Misty';
 import JumpState from "./JumpState";
 import FallState from './FallState';
 import RunState from './RunState';
+import { KeyDict, KeyMap } from '../types';
 
 export default class IdleState extends BaseState {
 
     name = 'idle';
 
     enter() {
-        // this.sprite.body.setVelocityX(0);
         this.sprite.anims.play('misty_idle', true);
-        this.sprite.hasDoubleJump = true;
     }
 
-    update(): StateReturn|void {
-
-        const controls = this.getControls();
+    update(delta: number, controls: KeyMap): StateReturn|void {
 
         if (!this.sprite.body.onFloor()) {
             return { type: FallState , params: { graceJump: true }}

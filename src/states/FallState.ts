@@ -3,19 +3,26 @@ import { Direction } from '../Objects/Misty';
 import IdleState from './IdleState';
 import JumpState from "./JumpState";
 import SlideState from "./SlideState";
+import { KeyDict, KeyMap } from '../types';
 
 export default class FallState extends BaseState {
 
     name = 'fall';
+    hasDouble = true;
     graceJumpTimer = 0;
     fallThruTimer = 0;
 
-    enter(params: { graceJump: boolean, fallThru: boolean }) {
-        this.sprite.anims.play('misty_fall', true);
-        if (params.graceJump) {
+    enter(params: { hasDouble: boolean, graceJump: boolean, fallThru: boolean }) {
+
+        if ('hasDouble' in params) {
+            this.hasDouble = params.hasDouble;
+        }
+
+        if ('graceJump' in params) {
             this.graceJumpTimer = this.sprite.graceJumpTimer;
         }
-        if (params.fallThru) {
+
+        if ('fallThru' in params) {
             // add extra downward force!
             this.sprite.body.setVelocityY(this.sprite.fallThruPower);
             this.sprite.fallThru = true;
@@ -23,15 +30,15 @@ export default class FallState extends BaseState {
         } else {
             this.sprite.fallThru = false;
         }
+
+        this.sprite.anims.play('misty_fall', true);
     }
 
     exit() {
         this.sprite.fallThru = false;
     }
 
-    update(delta: number): StateReturn|void {
-
-        const controls = this.getControls();
+    update(delta: number, controls: KeyMap): StateReturn|void {
 
         if (this.fallThruTimer > 0) {
             this.fallThruTimer -= delta;
@@ -44,11 +51,10 @@ export default class FallState extends BaseState {
             this.graceJumpTimer -= delta;
         }
 
-
-        if (this.sprite.jumpJustPressed) {
+        if (controls.jumpJustPressed) {
             if (this.graceJumpTimer > 0) {
                 return { type: JumpState };
-            } else if (this.sprite.hasDoubleJump) {
+            } else if (this.hasDouble) {
                 return { type: JumpState, params: { isDouble: true }};
             }
         }
